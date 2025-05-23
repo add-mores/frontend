@@ -128,46 +128,43 @@ export default function ClientHospital() {
 
         {/* 진료과 필터(Select) */}
         + {/* ─── 진료과 드롭다운 + 체크박스 ─── */}
- <div className="mb-6 relative">
-   <details className="w-full">
-     <summary
-       className="flex justify-between items-center px-4 py-2 bg-white text-black rounded-full cursor-pointer select-none"
-     >
-       <span className="font-semibold">진료과 필터</span>
-       <span className="text-sm text-gray-600">{selectedDepts.length}개 선택</span>
-     </summary>
-     <div
-       className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-2xl max-h-48 overflow-auto p-3 shadow-lg"
-     >
-       {allDepts.map(d => (
-         <label key={d} className="flex items-center space-x-2 py-1">
-           <input
-             type="checkbox"
-             disabled={isAutoMode}
-             checked={selectedDepts.includes(d)}
-             onChange={() => {
-               setSelectedDepts(prev =>
-                 prev.includes(d)
-                   ? prev.filter(x => x !== d)
-                   : [...prev, d]
-               )
-             }}
-             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-           />
-           <span className="text-black">{d}</span>
-         </label>
-       ))}
-       {isAutoMode && (
-         <button
-           onClick={() => setIsAutoMode(false)}
-           className="mt-2 px-3 py-1 bg-gray-600 text-gray-200 rounded-full hover:bg-gray-500 w-full"
-         >
-           수동 모드 전환
-         </button>
-       )}
-     </div>
-   </details>
- </div>
+<div className="mb-6 relative">
+  <details className="w-full group">
+    <summary className="flex justify-between items-center px-4 py-2 bg-white dark:bg-gray-700 text-black dark:text-white rounded-full cursor-pointer select-none border border-gray-300">
+      <span className="font-semibold">진료과 필터</span>
+      <span className="text-sm text-gray-600 dark:text-gray-200">{selectedDepts.length}개 선택</span>
+    </summary>
+    <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-2xl max-h-48 overflow-auto p-3 shadow-lg">
+      {allDepts.map(d => (
+        <label key={d} className="flex items-center space-x-2 py-1 cursor-pointer">
+          <input
+            type="checkbox"
+            disabled={isAutoMode}
+            checked={selectedDepts.includes(d)}
+            onChange={() => {
+              setSelectedDepts(prev =>
+                prev.includes(d)
+                  ? prev.filter(x => x !== d)
+                  : [...prev, d]
+              )
+            }}
+            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <span className="text-black dark:text-white">{d}</span>
+        </label>
+      ))}
+      {isAutoMode && (
+        <button
+          onClick={() => setIsAutoMode(false)}
+          className="mt-2 px-3 py-1 bg-gray-600 text-gray-200 rounded-full hover:bg-gray-500 w-full"
+        >
+          수동 모드 전환
+        </button>
+      )}
+    </div>
+  </details>
+</div>
+
 
         {/* 병원 목록 */}
         <div className="flex-1 overflow-auto">
@@ -199,28 +196,29 @@ export default function ClientHospital() {
                   거리: {h.distance.toFixed(2)}km
                 </span>
                 <div className="flex space-x-2">
-                  <a
-                    href={`kakaomap://look?p=${h.lat},${h.lon}`}
-                    target="_blank"
-                    className="flex items-center px-2 py-1 bg-[#fee500] text-black rounded text-xs"
-                  >
-                    <SiKakaotalk className="w-4 h-4 mr-1" /> 카카오맵
-                  </a>
-                  <a
-                    href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`}
-                    target="_blank"
-                    className="flex items-center px-2 py-1 bg-[#03c75a] text-white rounded text-xs"
-                  >
-                    <SiNaver className="w-4 h-4 mr-1" /> 네이버지도
-                  </a>
-                  <a
-                    href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`}
-                    target="_blank"
-                    className="flex items-center px-2 py-1 bg-[#1a73e8] text-white rounded text-xs"
-                  >
-                    <SiGooglemaps className="w-4 h-4 mr-1" /> 구글지도
-                  </a>
-                </div>
+                <a
+                  href={`kakaomap://look?p=${h.lat},${h.lon}`}
+                  target="_blank"
+                  className="flex items-center px-3 py-1 bg-yellow-400 text-black rounded-full text-xs"
+                >
+                  <SiKakaotalk className="w-4 h-4 mr-1" /> 카카오맵
+                </a>
+                <a
+                  href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`}
+                  target="_blank"
+                  className="flex items-center px-3 py-1 bg-green-600 text-white rounded-full text-xs"
+                >
+                  <SiNaver className="w-4 h-4 mr-1" /> 네이버지도
+                </a>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`}
+                  target="_blank"
+                  className="flex items-center px-3 py-1 bg-blue-600 text-white rounded-full text-xs"
+                >
+                  <SiGooglemaps className="w-4 h-4 mr-1" /> 구글지도
+                </a>
+              </div>
+
               </div>
             </div>
           ))}
