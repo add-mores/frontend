@@ -1,103 +1,58 @@
-import Image from "next/image";
+'use client';
+
+import Link from 'next/link';
+import React from 'react';
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="min-h-screen bg-white text-black px-4 py-8">
+      <div className="text-center mb-10 animate-fadein">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">
+          🩺 증상 기반 질병 예측 및 의료 정보 추천 서비스
+        </h1>
+        <p className="text-lg md:text-xl text-gray-700">
+          <strong className="text-teal-700 font-semibold">입력한 증상으로 AI가 유사한 질병을 예측하고,</strong><br />
+          <strong className="text-teal-700 font-semibold">관련 병원과 약품 정보를 통합적으로 추천해드립니다.</strong>
+        </p>
+      </div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <Link href="/disease" className="block p-6 bg-white rounded-2xl shadow-md hover:scale-[1.02] transition-transform animate-fadein">
+          <h3 className="text-xl font-semibold mb-2">🔍 질병 추천</h3>
+          <p className="text-gray-700">증상을 기반으로 유사한 질병을 추천합니다.</p>
+        </Link>
+        <Link href="/hospital" className="block p-6 bg-white rounded-2xl shadow-md hover:scale-[1.02] transition-transform animate-fadein">
+          <h3 className="text-xl font-semibold mb-2">🏥 병원 찾기</h3>
+          <p className="text-gray-700">현 위치 또는 지역 기반 병원을 추천합니다.</p>
+        </Link>
+        <Link href="/medicine" className="block p-6 bg-white rounded-2xl shadow-md hover:scale-[1.02] transition-transform animate-fadein">
+          <h3 className="text-xl font-semibold mb-2">💊 의약품 추천</h3>
+          <p className="text-gray-700">질병/증상에 맞는 의약품 정보를 제공합니다.</p>
+        </Link>
+      </div>
+
+      <div className="text-sm text-gray-600 leading-relaxed animate-fadein">
+        <p className="mb-1 font-semibold">❗ 이용 시 유의사항</p>
+        <p>
+          이 웹사이트에서 제공하는 모든 정보는 학습 및 일반적인 정보 제공을 목적으로 하며,<br />
+          의학적 진단이나 치료를 대체하지 않습니다. 건강에 관한 의문이 있을 경우,<br />
+          반드시 의료 전문가인 의사의 진단을 받으시기 바랍니다.<br />
+          또한 당사는 의약품 및 건강 관련 정보의 정확성을 보장하지 않으며,<br />
+          의약품 사용과 관련된 모든 결정은 의료 전문가의 지도 아래에서 이루어져야 합니다.<br />
+          이 웹사이트는 의료 서비스를 제공하지 않으며, 의약품 판매를 목적으로 하지 않습니다.
+        </p>
+      </div>
+
+      <style jsx>{`
+        .animate-fadein {
+          animation: fadein 1.2s ease-in-out forwards;
+          opacity: 0;
+        }
+        @keyframes fadein {
+          0% { opacity: 0; transform: translateY(10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </main>
   );
 }
