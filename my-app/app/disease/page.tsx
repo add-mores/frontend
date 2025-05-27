@@ -46,8 +46,10 @@ export default function DiseaseSearchPage() {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-6">
-            <h1 className="text-2xl font-bold mb-2">🏥 질병 정보 검색</h1>
-            <p className="text-gray-600 mb-4">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>
+            <div className="text-center">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 tracking-tight">🏥 질병 정보 서비스</h1>
+                <p className="mt-4 text-lg text-gray-600">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>
+            </div>
 
             <div className="flex gap-2 mb-4 flex-wrap">
                 <Input
