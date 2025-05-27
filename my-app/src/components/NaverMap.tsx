@@ -1,94 +1,82 @@
-'use client'
+import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 
-import { useEffect, useRef } from 'react'
-
-declare global {
-  interface Window { naver: any }
+export interface NaverMapHandle {
+  panTo: (pos: { lat: number, lng: number }, opts?: any) => void
 }
 
+interface LatLng { lat: number; lon: number }
 interface Hospital {
   hos_nm: string
-  add: string
-  deps: string
   lat: number
   lon: number
 }
 
-export default function NaverMap({
-  center,
-  hospitals,
-  selectedHospital
-}: {
-  center: { lat: number; lon: number }
+type Props = {
+  center: LatLng
   hospitals: Hospital[]
-  selectedHospital?: { lat: number; lon: number } | null
-}) {
-  const mapRef = useRef<HTMLDivElement>(null)
-  const mapInstance = useRef<any>(null)
-  const markers = useRef<any[]>([])
+  selectedHos?: string
+  onMarkerClick?: (h: Hospital) => void
+}
 
-  // ── 맵 생성 / 중심 갱신 ───────────────
-  useEffect(() => {
-    console.log('▶️ NaverMap useEffect[center] fired:', {
-      hasWindow: !!window.naver,
-      hasRef: !!mapRef.current,
-      center
-    })
-    if (!window.naver || !mapRef.current) return
+// forwardRef로 외부에서 panTo 등 제어 가능하게!
+const NaverMap = forwardRef<NaverMapHandle, Props>(
+  ({ center, hospitals, selectedHos, onMarkerClick }, ref) => {
+    const mapRef = useRef<HTMLDivElement>(null)
+    const mapInstance = useRef<any>(null)
+    const markerMap = useRef<{ [hos_nm: string]: any }>({})
 
-    console.log('✅ 지도 생성 시작', center)
-    if (!mapInstance.current) {
-      mapInstance.current = new window.naver.maps.Map(mapRef.current, {
-        center: new window.naver.maps.LatLng(center.lat, center.lon),
-        zoom: 15
-      })
-      console.log('🟢 mapInstance 생성됨:', mapInstance.current)
-    } else {
+    // 지도 mount
+    useEffect(() => {
+      if (!mapRef.current || !window.naver?.maps) return
+      if (!mapInstance.current) {
+        mapInstance.current = new window.naver.maps.Map(mapRef.current, {
+          center: new window.naver.maps.LatLng(center.lat, center.lon),
+          zoom: 15,
+        })
+      }
+    }, [])
+
+    // 중심 이동
+    useEffect(() => {
+      if (!mapInstance.current) return
       mapInstance.current.setCenter(
         new window.naver.maps.LatLng(center.lat, center.lon)
       )
-      console.log('🟡 mapInstance 중심 갱신:', center)
-    }
-  }, [center])
+    }, [center.lat, center.lon])
 
-  // ── 마커 렌더링 ───────────────
-  useEffect(() => {
-    console.log('▶️ NaverMap useEffect[hospitals] fired:', hospitals.length, 'items')
-    if (!mapInstance.current) return
+    // 마커 렌더링
+    useEffect(() => {
+      if (!mapInstance.current) return
+      // 기존 마커 제거
+      Object.values(markerMap.current).forEach(m => m.setMap(null))
+      markerMap.current = {}
 
-    markers.current.forEach(m => m.setMap(null))
-    markers.current = []
-
-    hospitals.forEach(h => {
-      const marker = new window.naver.maps.Marker({
-        position: new window.naver.maps.LatLng(h.lat, h.lon),
-        map: mapInstance.current,
-        title: h.hos_nm
+      hospitals.forEach(h => {
+        const marker = new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(h.lat, h.lon),
+          map: mapInstance.current,
+          title: h.hos_nm,
+        })
+        marker.addListener('click', () => onMarkerClick?.(h))
+        markerMap.current[h.hos_nm] = marker
       })
-      markers.current.push(marker)
-    })
-    console.log(`📍 ${hospitals.length}개 마커 렌더 완료`)
-  }, [hospitals])
+    }, [hospitals, selectedHos, onMarkerClick])
 
-  // ── 병원 선택 시 이동 ───────────────
-  useEffect(() => {
-    console.log('▶️ NaverMap useEffect[selectedHospital] fired:', selectedHospital)
-    if (selectedHospital && mapInstance.current) {
-      mapInstance.current.setCenter(
-        new window.naver.maps.LatLng(selectedHospital.lat, selectedHospital.lon)
-      )
-      console.log('🎯 선택된 병원으로 이동:', selectedHospital)
-    }
-  }, [selectedHospital])
+    // 외부에서 panTo 호출
+    useImperativeHandle(ref, () => ({
+      panTo: (pos, opts) => {
+        if (mapInstance.current)
+          mapInstance.current.panTo(
+            new window.naver.maps.LatLng(pos.lat, pos.lng), opts
+          )
+      }
+    }))
 
-  return (
-    <div
-      ref={mapRef}
-      style={{
-        width: '100%',
-        height: '400px',
-        border: '2px dashed green'
-      }}
-    />
-  )
-}
+    // 꼭 style!
+    return (
+      <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+    )
+  }
+)
+
+export default NaverMap
