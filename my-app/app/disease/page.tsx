@@ -4,11 +4,13 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from 'next/navigation';
 
 
 export default function DiseaseSearchPage() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
+    const router = useRouter();
 
     const handleSearch = async () => {
         if (!query.trim()) return;
@@ -67,7 +69,7 @@ export default function DiseaseSearchPage() {
                     <div className="flex justify-center gap-4 mt-8">
                         <Button
                             variant="outline"
-                            onClick={() => window.location.href = "/medicine"}
+                            onClick={() => router.push(`/medicine?query=${encodeURIComponent(query)}`)}
                         >
                             💊 의약품 추천 보기
                         </Button>
