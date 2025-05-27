@@ -19,18 +19,19 @@ export default function Home() {
     const handleSearch = async () => {
         setLoading(true);
         try {
-            const response = await fetch('/api/recommend', {
+            const response = await fetch('http://localhost:8000/api/medicine', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    symptoms,
-                    ageGroup: ageGroup === 'none' ? '' : ageGroup,
-                    isPregnant,
-                    disease,
+                    symptom: symptoms,
+                    age_group: ageGroup === 'none' ? '' : ageGroup,
+                    is_pregnant: isPregnant,
+                    has_disease: disease ? disease.split(',').map(d => d.trim()) : [],
+                    top_n: 5,
                 }),
             });
             const data = await response.json();
-            setResult(data);
+            setResult(data.result || []);
         } catch (err) {
             console.error(err);
         }
@@ -47,7 +48,7 @@ export default function Home() {
 
                 <Card className="p-8 backdrop-blur-lg bg-white/70 border border-sky-100 rounded-2xl shadow-lg">
                     <CardContent className="space-y-6">
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                             <Label htmlFor="symptoms" className="font-medium">📝 증상 또는 질환 입력</Label>
                             <Input
                                 id="symptoms"
@@ -55,7 +56,54 @@ export default function Home() {
                                 value={symptoms}
                                 onChange={(e) => setSymptoms(e.target.value)}
                             />
-                        </div>
+                        </div> */}
+
+                        <form className="max-w-md mx-auto">
+                            <label
+                                htmlFor="symptoms"
+                                className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+                            >
+                                증상 검색
+                            </label>
+                            <div className="relative">
+                                {/* 왼쪽 돋보기 아이콘 */}
+                                <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <svg
+                                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                                        aria-hidden="true"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            stroke="currentColor"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                                        />
+                                    </svg>
+                                </div>
+
+                                {/* 입력 필드 */}
+                                <input
+                                    type="search"
+                                    id="symptoms"
+                                    className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-sky-500 focus:border-sky-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-sky-500 dark:focus:border-sky-500"
+                                    placeholder="예: 소화불량, 기침, 위염"
+                                    value={symptoms}
+                                    onChange={(e) => setSymptoms(e.target.value)}
+                                />
+
+                                {/* 검색 버튼 */}
+                                <button
+                                    type="submit"
+                                    className="text-white absolute end-2.5 bottom-2.5 bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-sky-500 dark:hover:bg-sky-600 dark:focus:ring-sky-800"
+                                >
+                                    Search
+                                </button>
+                            </div>
+                        </form>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
