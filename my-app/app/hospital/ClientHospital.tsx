@@ -110,9 +110,9 @@ export default function ClientHospital() {
     // 추천 과목에서 'string' 플레이스홀더 제거 & 중복 제거
     const recDepts = recommendations.map(r => r.department).filter(d => d && d !== 'string')
     const uniqueRecDepts = [...new Set(recDepts)]
-    const depsToSend = (isAutoMode && uniqueRecDepts.length > 0)
-      ? uniqueRecDepts
-      : undefined
+    const depsToSend = isAutoMode
+      ? (uniqueRecDepts.length > 0 ? uniqueRecDepts : undefined)
+      : (selectedDepts.length > 0 ? selectedDepts : undefined)
 
     axios.post<Hospital[]>(`${apiBase}/api/hospital`, {
       lat: location.lat,
@@ -124,7 +124,7 @@ export default function ClientHospital() {
     .then(r => setHospitals(r.data))
     .catch(e => setError(e.message))
     .finally(() => setLoading(false))
-  }, [location, radius, debouncedName, isAutoMode, recommendations, apiBase])
+  }, [location, radius, debouncedName, isAutoMode, recommendations, selectedDepts, apiBase])
 
   // ─── 지도 패닝 및 클립보드 복사 ───
   const mapRef = useRef<any>(null)
