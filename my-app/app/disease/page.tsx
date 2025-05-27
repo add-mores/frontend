@@ -63,6 +63,21 @@ export default function DiseaseSearchPage() {
 
             {results.length > 0 && (
                 <>
+                    {/* 🔗 의약품/병원 추천 버튼 추가 */}
+                    <div className="flex justify-center gap-4 mt-8">
+                        <Button
+                            variant="outline"
+                            onClick={() => window.location.href = "/medicine"}
+                        >
+                            💊 의약품 추천 보기
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => window.location.href = "/hospital"}
+                        >
+                            🏥 병원 추천 보기
+                        </Button>
+                    </div>
                     <h2 className="text-xl font-semibold mt-6 mb-2">🔍 검색 결과</h2>
                     <div className="space-y-4">
                         {results.map((item, index) => (
