@@ -97,13 +97,9 @@ export default function DiseaseSearchPage() {
 
                                     <div className="mt-2">
                                         <p className="text-blue-500 font-semibold">🔑 관련 키워드</p>
-                                        <div className="flex flex-wrap gap-2 mt-1">
-                                            {item.matched_tokens.map((token) => (
-                                                <span key={token} className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 rounded-full px-2 py-1">
-                                                    {token}
-                                                </span>
-                                            ))}
-                                        </div>
+                                        <p className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-sm">
+                                            {item.matched_tokens.length > 0 ? item.matched_tokens.join(", ") : "정보 없음"}
+                                        </p>
                                     </div>
                                 </CardContent>
                             </Card>
