@@ -19,18 +19,19 @@ export default function Home() {
     const handleSearch = async () => {
         setLoading(true);
         try {
-            const response = await fetch('/api/recommend', {
+            const response = await fetch('http://localhost:8000/api/medicine', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    symptoms,
-                    ageGroup: ageGroup === 'none' ? '' : ageGroup,
-                    isPregnant,
-                    disease,
+                    symptom: symptoms,
+                    age_group: ageGroup === 'none' ? '' : ageGroup,
+                    is_pregnant: isPregnant,
+                    has_disease: disease ? disease.split(',').map(d => d.trim()) : [],
+                    top_n: 5,
                 }),
             });
             const data = await response.json();
-            setResult(data);
+            setResult(data.result || []);
         } catch (err) {
             console.error(err);
         }
