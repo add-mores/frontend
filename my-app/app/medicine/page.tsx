@@ -19,7 +19,7 @@ export default function Home() {
     const handleSearch = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:8000/api/medicine', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/medicine`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -36,9 +36,13 @@ export default function Home() {
             console.error(err);
         }
         setLoading(false);
+
     };
 
+
+
     return (
+
         <div className="min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
             <div className="max-w-6xl mx-auto space-y-16">
                 <div className="text-center">
@@ -188,5 +192,9 @@ export default function Home() {
                 )}
             </div>
         </div>
+
+
+
     );
+
 }
