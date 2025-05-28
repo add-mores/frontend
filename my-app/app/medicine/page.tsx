@@ -35,7 +35,7 @@ export default function MedicineSearchPage() {
         try {
 
             // 1. insert API 호출
-            const insertRes = await fetch("http://localhost:8000/api/insert", {
+            const insertRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/insert`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: symptomText }),
@@ -55,7 +55,7 @@ export default function MedicineSearchPage() {
             const positiveText = positiveList.map(s => s.trim()).join(" ");
 
             // 3. medicine API 호출
-            const response = await fetch("http://localhost:8000/api/medicine", {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/medicine`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
