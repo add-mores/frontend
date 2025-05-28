@@ -46,8 +46,10 @@ export default function DiseaseSearchPage() {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-6">
-            <h1 className="text-2xl font-bold mb-2">🏥 질병 정보 검색</h1>
-            <p className="text-gray-600 mb-4">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>
+            <div className="text-center">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 tracking-tight">🏥 질병 정보 서비스</h1>
+                <p className="mt-4 text-lg text-gray-600">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>
+            </div>
 
             <div className="flex gap-2 mb-4 flex-wrap">
                 <Input
@@ -61,6 +63,21 @@ export default function DiseaseSearchPage() {
 
             {results.length > 0 && (
                 <>
+                    {/* 🔗 의약품/병원 추천 버튼 추가 */}
+                    <div className="flex justify-center gap-4 mt-8">
+                        <Button
+                            variant="outline"
+                            onClick={() => window.location.href = "/medicine"}
+                        >
+                            💊 의약품 추천 보기
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => window.location.href = "/hospital"}
+                        >
+                            🏥 병원 추천 보기
+                        </Button>
+                    </div>
                     <h2 className="text-xl font-semibold mt-6 mb-2">🔍 검색 결과</h2>
                     <div className="space-y-4">
                         {results.map((item, index) => (
