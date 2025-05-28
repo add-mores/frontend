@@ -6,6 +6,7 @@ import {
     SelectContent, SelectItem, SelectTrigger, SelectValue,
     Switch, Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui';
+
 import { Loader2 } from 'lucide-react';
 
 export default function Home() {
@@ -52,15 +53,6 @@ export default function Home() {
 
                 <Card className="p-8 backdrop-blur-lg bg-white/70 border border-sky-100 rounded-2xl shadow-lg">
                     <CardContent className="space-y-6">
-                        {/* <div className="space-y-2">
-                            <Label htmlFor="symptoms" className="font-medium">📝 증상 또는 질환 입력</Label>
-                            <Input
-                                id="symptoms"
-                                placeholder="예: 소화불량, 기침, 위염"
-                                value={symptoms}
-                                onChange={(e) => setSymptoms(e.target.value)}
-                            />
-                        </div> */}
 
                         <form className="max-w-md mx-auto">
                             <label
