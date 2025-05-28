@@ -172,6 +172,19 @@ export default function ClientHospital() {
                         {location && (
               <>
             {/* 내 위치 재요청 버튼 */}
+                     {/* 정확도 배지 */}
+         {location && (
+           <div className="absolute top-3 left-3 z-20 inline-flex items-center space-x-1
+                           bg-white px-3 py-1 rounded-full text-sm font-medium text-black
+                           ring-1 ring-gray-300 shadow">
+             {location.accuracy > 0
+               ? <>📍 정확도: ±{Math.round(location.accuracy)}m</>
+               : <>📍 주소 기준</>
+             }
+           </div>
+         )}
+      
+         {/* 내 위치 재요청 버튼 */}
                 <button
                   onClick={getLocation}
                   className="absolute top-3 right-3 z-20 bg-white px-3 py-1 rounded-lg
