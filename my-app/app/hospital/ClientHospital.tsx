@@ -43,9 +43,7 @@ export default function ClientHospital() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const apiBase = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8000'
-    : 'https://addmore.kr'
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 
   // 위치 조회 함수

@@ -18,7 +18,7 @@ export default function DiseaseSearchPage() {
 
         try {
             // 1. insert API 호출
-            const insertRes = await fetch('http://localhost:8000/api/insert', {
+            const insertRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/insert`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -31,7 +31,7 @@ export default function DiseaseSearchPage() {
             const insertData = await insertRes.json();
 
             // 2. disease API 호출 (insert 응답 그대로 사용)
-            const diseaseRes = await fetch('http://localhost:8000/api/disease', {
+            const diseaseRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/disease`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
