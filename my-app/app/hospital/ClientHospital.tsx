@@ -198,7 +198,7 @@ export default function ClientHospital() {
                     placeholder="📍 주소를 입력하세요"
                     value={searchAddress}
                     onChange={e => setSearchAddress(e.target.value)}
-                    className="flex-1 px-4 py-2 bg-gray-100 rounded-lg"
+                    className="flex-1 px-4 py-2 bg-black-100 rounded-lg"
                   />
                   <button
                     onClick={handleSearchAddress}
