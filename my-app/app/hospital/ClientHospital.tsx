@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import axios from 'axios'
 import { CopyIcon, Clipboard } from 'lucide-react'
-import { SiKakaotalk, SiNaver, SiGooglemaps } from 'react-icons/si'
+// import { SiKakaotalk, SiNaver, SiGooglemaps } from 'react-icons/si'
+
 
 // SSR을 피하기 위해 동적으로 불러오는 네이버 지도 컴포넌트
 const NaverMap = dynamic(() => import('@/components/NaverMap'), { ssr: false })
@@ -22,111 +23,122 @@ interface Hospital {
 
 export default function ClientHospital() {
   // ─── URL 파라미터로 자동/수동 모드 결정 ───
-  const searchParams       = useSearchParams()
-  const queryDepts         = searchParams.getAll('depts')
-  const [isAutoMode, setIsAutoMode]       = useState(queryDepts.length > 0)
-  const [selectedDepts, setSelectedDepts] = useState<string[]>(queryDepts)
-  // 주소 검색 란 추가
-  const [searchAddress, setSearchAddress] = useState('')
+  const searchParams = useSearchParams()
+  const departmentsParam = searchParams.get('departments')
+  const queryDepts = departmentsParam ? departmentsParam.split(',') : []
 
-  // ─── 위치(위·경도) & 정확도 ───
-  const [location, setLocation] = useState<{ lat:number; lon:number; accuracy:number } | null>(null)
+  // 상태 선언
+  const [isAutoMode, setIsAutoMode] = useState(false)
+  const [selectedDepts, setSelectedDepts] = useState<string[]>([])
+  const [location, setLocation] = useState<{ lat: number; lon: number; accuracy: number } | null>(null)
+
+  const [searchAddress, setSearchAddress] = useState('')
+  const [searchName, setSearchName] = useState('')
+  const [debouncedName, setDebouncedName] = useState(searchName)
+  const [radius, setRadius] = useState(1)
+
+  const [allDepts, setAllDepts] = useState<string[]>([])
+  const [hospitals, setHospitals] = useState<Hospital[]>([])
+  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const apiBase = process.env.NODE_ENV === 'development'
+    ? 'http://localhost:8000'
+    : 'https://addmore.kr'
+
+
+  // 위치 조회 함수
   const getLocation = () => {
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => setLocation({
-        lat: coords.latitude,
-        lon: coords.longitude,
-        accuracy: coords.accuracy
-      }),
+      ({ coords }) => setLocation({ lat: coords.latitude, lon: coords.longitude, accuracy: coords.accuracy }),
       () => alert('위치 정보를 가져오지 못했습니다.'),
       { enableHighAccuracy: true }
     )
   }
-  useEffect(getLocation, [])  // 처음 마운트 시 위치 요청
 
-  // ─── 병원명 검색 디바운스 ───
-  const [searchName, setSearchName]       = useState('')
-  const [debouncedName, setDebouncedName] = useState(searchName)
+  // 초기 위치 조회 (컴포넌트 마운트 시)
   useEffect(() => {
-    const id = setTimeout(() => setDebouncedName(searchName), 300)
-    return () => clearTimeout(id)
-  }, [searchName])
-  // - 주소 검색시 API 호출
-  const handleSearchAddress = async () => {
-  if (!searchAddress) return
-  try {
-    const { data } = await axios.get(
-      `${apiBase}/geocode`,
-      { params: { query: searchAddress } }
-    )
-    if (data.lat != null && data.lon != null) {
-      setLocation({ lat: data.lat, lon: data.lon, accuracy: 0 })
-    } else {
-      alert('주소를 찾을 수 없습니다.')
-    }
-  } catch (e) {
-    console.error(e)
-    alert('검색 중 오류가 발생했습니다.')
-  }
-}
+    getLocation()
+  }, [])
 
-  
-  // ─── 반경 슬라이더 ───
-  const [radius, setRadius] = useState(1)
-
-  // ─── 전체 진료과 목록 불러오기 ───
-  const [allDepts, setAllDepts] = useState<string[]>([])
-  const apiBase = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:8000'
-    : 'https://addmore.kr'
+  // 전체 진료과 목록 불러오기
   useEffect(() => {
     axios.get<string[]>(`${apiBase}/list_departments`)
-      .then(r => setAllDepts(r.data))
+      .then(res => setAllDepts(res.data))
       .catch(console.error)
   }, [apiBase])
 
-  // ─── 증상 기반 추천 진료과 호출 ───
-  const [recommendations, setRecommendations] = useState<{ department: string }[]>([])
+  // debouncedName 처리
   useEffect(() => {
-    const userSymptoms = ['두통','기침','발열']  // 실제 사용자 입력으로 교체
-    axios.post<{ recommendations: { department: string }[] }>(
-      `${apiBase}/api/disease`, { symptoms: userSymptoms }
-    )
-    .then(r => setRecommendations(r.data.recommendations))
-    .catch(console.error)
-  }, [apiBase])
+    const timer = setTimeout(() => {
+      setDebouncedName(searchName)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [searchName])
 
-  // ─── 병원 목록 & 상태 ───
-  const [hospitals, setHospitals]               = useState<Hospital[]>([])
-  const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null)
-  const [loading, setLoading]                   = useState(false)
-  const [error, setError]                       = useState<string | null>(null)
+  // URL 쿼리로 진료과가 있으면 selectedDepts에 세팅
+  // 위치가 준비되면 쿼리 있는 경우, deps 포함 검색 수행
+    useEffect(() => {
+    const hasQueryDepts = queryDepts.length > 0
 
-  // ─── 병원 조회 & 필터링 (위치・반경・진료과・이름) ───
-  useEffect(() => {
+    if (location) {
+      if (hasQueryDepts) {
+        setSelectedDepts(queryDepts)
+        setIsAutoMode(true)  // ✅ URL에 진료과가 있으면 auto 모드 ON
+      } else {
+        setSelectedDepts([])
+        setIsAutoMode(false) // ❌ 없으면 auto 모드 OFF
+      }
+    }
+  }, [location, queryDepts.join(',')])
+
+  // 병원 조회 함수
+  const fetchHospitals = async (deps?: string[]) => {
     if (!location) return
-    setLoading(true); setError(null)
+    setLoading(true)
+    setError(null)
+    try {
+      const params = {
+        lat: location.lat,
+        lon: location.lon,
+        radius,
+        search_name: debouncedName || undefined,
+        deps: deps && deps.length > 0 ? deps : undefined,
+      }
+      const res = await axios.post<Hospital[]>(`${apiBase}/api/hospital`, params)
+      setHospitals(res.data)
+    } catch (e: any) {
+      setError(e.message || '병원 조회 중 오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
-    // 추천 과목에서 'string' 플레이스홀더 제거 & 중복 제거
-    const recDepts = recommendations.map(r => r.department).filter(d => d && d !== 'string')
-    const uniqueRecDepts = [...new Set(recDepts)]
-    const depsToSend = (isAutoMode && uniqueRecDepts.length > 0)
-      ? uniqueRecDepts
-      : undefined
+  // 위치가 세팅되고 selectedDepts가 변할 때 병원 검색
+  // 쿼리가 있으면 selectedDepts를 이용, 없으면 빈 배열로 호출해서 deps 없이 검색
+  useEffect(() => {
+    if (location) {
+      fetchHospitals(selectedDepts)
+    }
+  }, [location, selectedDepts, radius, debouncedName])
 
-    axios.post<Hospital[]>(`${apiBase}/api/hospital`, {
-      lat: location.lat,
-      lon: location.lon,
-      radius,
-      deps: depsToSend,
-      search_name: debouncedName || undefined
-    })
-    .then(r => setHospitals(r.data))
-    .catch(e => setError(e.message))
-    .finally(() => setLoading(false))
-  }, [location, radius, debouncedName, isAutoMode, recommendations, apiBase])
+  // 주소 검색 버튼 핸들러
+  const handleSearchAddress = async () => {
+    if (!searchAddress) return
+    try {
+      const { data } = await axios.get(`${apiBase}/geocode`, { params: { query: searchAddress } })
+      if (data.lat != null && data.lon != null) {
+        setLocation({ lat: data.lat, lon: data.lon, accuracy: 0 })
+      } else {
+        alert('주소를 찾을 수 없습니다.')
+      }
+    } catch {
+      alert('주소 검색 중 오류가 발생했습니다.')
+    }
+  }
 
-  // ─── 지도 패닝 및 클립보드 복사 ───
+  // 지도 패닝 및 클립보드 복사
   const mapRef = useRef<any>(null)
   const onSelect = (h: Hospital) => {
     setSelectedHospital(h)

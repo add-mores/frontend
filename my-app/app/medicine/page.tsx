@@ -6,41 +6,81 @@ import {
     SelectContent, SelectItem, SelectTrigger, SelectValue,
     Switch, Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui';
-
 import { Loader2 } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
-export default function Home() {
+export default function MedicineSearchPage() {
     const [symptoms, setSymptoms] = useState('');
     const [ageGroup, setAgeGroup] = useState('');
     const [isPregnant, setIsPregnant] = useState(false);
     const [disease, setDisease] = useState('');
     const [result, setResult] = useState([]);
     const [loading, setLoading] = useState(false);
+    
+    const searchParams = useSearchParams();
+    const initialQuery = searchParams.get('query');
+    
+    // 컴포넌트 mount 시, query가 있으면 자동 실행
+    useEffect(() => {
+        if (initialQuery) {
+            setSymptoms(initialQuery);
+            handleSearchWithValue(initialQuery);
+        }
+    }, [initialQuery]);
 
-    const handleSearch = async () => {
+    // insert API → positive → medicine API
+    const handleSearchWithValue = async (symptomText: string) => {
         setLoading(true);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/medicine`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+
+            // 1. insert API 호출
+            const insertRes = await fetch("http://localhost:8000/api/insert", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: symptomText }),
+            });
+
+            const insertData = await insertRes.json();
+            const positiveList: string[] = insertData?.positive;
+
+            if (!positiveList || positiveList.length === 0) {
+                alert("긍정적인 증상이 감지되지 않았습니다.");
+                setResult([]);
+                setLoading(false);
+                return;
+            }
+
+            // 2. 마침표 없이 공백으로 연결
+            const positiveText = positiveList.map(s => s.trim()).join(" ");
+
+            // 3. medicine API 호출
+            const response = await fetch("http://localhost:8000/api/medicine", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    symptom: symptoms,
-                    age_group: ageGroup === 'none' ? '' : ageGroup,
+                    symptom: positiveText,
+                    age_group: ageGroup === "none" ? "" : ageGroup,
                     is_pregnant: isPregnant,
-                    has_disease: disease ? disease.split(',').map(d => d.trim()) : [],
+                    has_disease: disease ? disease.split(",").map(d => d.trim()) : [],
                     top_n: 5,
                 }),
             });
+
             const data = await response.json();
             setResult(data.result || []);
         } catch (err) {
-            console.error(err);
+            console.error("의약품 추천 에러:", err);
+            alert("의약품 추천 중 문제가 발생했습니다.");
         }
         setLoading(false);
 
     };
 
-
+    // 🔍 버튼 클릭용 핸들러
+    const handleSearch = () => {
+        handleSearchWithValue(symptoms);
+    };
 
     return (
 
@@ -57,7 +97,7 @@ export default function Home() {
                         <form className="max-w-md mx-auto">
                             <label
                                 htmlFor="symptoms"
-                                className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white"
+                                className="mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             >
                                 증상 검색
                             </label>
@@ -91,13 +131,6 @@ export default function Home() {
                                     onChange={(e) => setSymptoms(e.target.value)}
                                 />
 
-                                {/* 검색 버튼 */}
-                                <button
-                                    type="submit"
-                                    className="text-white absolute end-2.5 bottom-2.5 bg-sky-600 hover:bg-sky-700 focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-sky-500 dark:hover:bg-sky-600 dark:focus:ring-sky-800"
-                                >
-                                    Search
-                                </button>
                             </div>
                         </form>
 
@@ -118,11 +151,31 @@ export default function Home() {
                                 </Select>
                             </div>
 
-                            <div>
+                            {/* <div>
                                 <Label className="flex items-center justify-between font-medium">
                                     임신 여부
                                     <Switch checked={isPregnant} onCheckedChange={setIsPregnant} />
                                 </Label>
+                            </div> */}
+
+                            <div className="space-y-1">
+                            <Label className="text-sm font-semibold text-gray-700">임신 여부</Label>
+                            <div className="flex gap-2">
+                                <Button
+                                type="button"
+                                variant={isPregnant ? "outline" : "default"}
+                                onClick={() => setIsPregnant(false)}
+                                >
+                                아니오
+                                </Button>
+                                <Button
+                                type="button"
+                                variant={isPregnant ? "default" : "outline"}
+                                onClick={() => setIsPregnant(true)}
+                                >
+                                예
+                                </Button>
+                            </div>
                             </div>
 
                             <div>

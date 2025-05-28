@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useRouter } from 'next/navigation';
 
 
 export default function DiseaseSearchPage() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
+    const router = useRouter();
 
     const handleSearch = async () => {
         if (!query.trim()) return;
@@ -44,6 +47,22 @@ export default function DiseaseSearchPage() {
         }
     };
 
+    const handleHospitalClick = () => {
+    // results 배열에서 모든 department 문자열 가져와서,
+    // 쉼표 기준으로 분리 → 공백/특수문자 제거 → 중복 제거
+    const allDepartments = results.flatMap(item => 
+        item.department 
+        ? item.department.split(",").map(dept => dept.trim().replace(/[^\w가-힣]/g, "")) // 한글+영문, 특수문자 제거
+        : []
+    );
+
+    const uniqueDepartments = Array.from(new Set(allDepartments.filter(Boolean)));
+
+    const queryStr = uniqueDepartments.join(",");
+
+    router.push(`/hospital?departments=${encodeURIComponent(queryStr)}`);
+    };
+
     return (
         <div className="max-w-4xl mx-auto px-4 py-6">
             <div className="text-center">
@@ -51,15 +70,33 @@ export default function DiseaseSearchPage() {
                 <p className="mt-4 text-lg text-gray-600">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>
             </div>
 
-            <div className="flex gap-2 mb-4 flex-wrap">
+            <Card className="p-6 backdrop-blur-lg bg-white/70 border border-sky-100 rounded-2xl shadow-md w-full max-w-md mx-auto mb-8">
+            <CardContent className="space-y-4">
+                {/* Label */}
+                <Label htmlFor="symptomQuery" className="block text-sm font-medium text-gray-700">
+                증상 검색
+                </Label>
+
+                {/* Input */}
                 <Input
-                    placeholder="예: 두통, 감기, 발열..."
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    className="flex-1 min-w-[200px]"
+                id="symptomQuery"
+                placeholder="예: 두통, 감기, 발열..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="w-full"
                 />
-                <Button onClick={handleSearch}>검색</Button>
-            </div>
+
+                {/* Button */}
+                <div className="flex justify-center">
+                <Button
+                className="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-xl transition duration-300"
+                onClick={handleSearch}
+                >
+                🔍 질병 검색
+                </Button>
+                </div>
+            </CardContent>
+            </Card>
 
             {results.length > 0 && (
                 <>
@@ -67,13 +104,13 @@ export default function DiseaseSearchPage() {
                     <div className="flex justify-center gap-4 mt-8">
                         <Button
                             variant="outline"
-                            onClick={() => window.location.href = "/medicine"}
+                            onClick={() => router.push(`/medicine?query=${encodeURIComponent(query)}`)}
                         >
                             💊 의약품 추천 보기
                         </Button>
                         <Button
                             variant="outline"
-                            onClick={() => window.location.href = "/hospital"}
+                            onClick={handleHospitalClick}
                         >
                             🏥 병원 추천 보기
                         </Button>
