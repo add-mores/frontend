@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from "react";
-import { Input, Label } from "@/components/ui/";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from 'next/navigation';
@@ -44,6 +45,22 @@ export default function DiseaseSearchPage() {
             console.error("API 호출 중 오류:", error);
             alert("검색 중 문제가 발생했습니다.");
         }
+    };
+
+    const handleHospitalClick = () => {
+    // results 배열에서 모든 department 문자열 가져와서,
+    // 쉼표 기준으로 분리 → 공백/특수문자 제거 → 중복 제거
+    const allDepartments = results.flatMap(item => 
+        item.department 
+        ? item.department.split(",").map(dept => dept.trim().replace(/[^\w가-힣]/g, "")) // 한글+영문, 특수문자 제거
+        : []
+    );
+
+    const uniqueDepartments = Array.from(new Set(allDepartments.filter(Boolean)));
+
+    const queryStr = uniqueDepartments.join(",");
+
+    router.push(`/hospital?departments=${encodeURIComponent(queryStr)}`);
     };
 
     return (
@@ -93,7 +110,7 @@ export default function DiseaseSearchPage() {
                         </Button>
                         <Button
                             variant="outline"
-                            onClick={() => window.location.href = "/hospital"}
+                            onClick={handleHospitalClick}
                         >
                             🏥 병원 추천 보기
                         </Button>

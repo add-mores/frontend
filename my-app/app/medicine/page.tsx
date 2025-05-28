@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-    Input, Button, Card, CardContent, Label, Select,
-    SelectContent, SelectItem, SelectTrigger, SelectValue,
-    Switch, Tabs, TabsContent, TabsList, TabsTrigger
-} from '@/components/ui';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
