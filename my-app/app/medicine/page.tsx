@@ -17,10 +17,10 @@ export default function MedicineSearchPage() {
     const [disease, setDisease] = useState('');
     const [result, setResult] = useState([]);
     const [loading, setLoading] = useState(false);
-    
+
     const searchParams = useSearchParams();
     const initialQuery = searchParams.get('query');
-    
+
     // 컴포넌트 mount 시, query가 있으면 자동 실행
     useEffect(() => {
         if (initialQuery) {
@@ -63,7 +63,7 @@ export default function MedicineSearchPage() {
                     age_group: ageGroup === "none" ? "" : ageGroup,
                     is_pregnant: isPregnant,
                     has_disease: disease ? disease.split(",").map(d => d.trim()) : [],
-                    top_n: 5,
+                    top_n: 6,
                 }),
             });
 
@@ -136,12 +136,12 @@ export default function MedicineSearchPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <Label className="font-medium">연령대 선택</Label>
+                                <Label className="font-semibold text-black mb-2 block">연령대 선택</Label>
                                 <Select onValueChange={setAgeGroup} defaultValue="">
-                                    <SelectTrigger>
+                                    <SelectTrigger className="text-black">
                                         <SelectValue placeholder="연령대 선택" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="bg-white text-black divide-y divide-gray-200/50 shadow-md">
                                         <SelectItem value="none">선택 없음</SelectItem>
                                         <SelectItem value="소아">소아</SelectItem>
                                         <SelectItem value="청소년">청소년</SelectItem>
@@ -151,36 +151,35 @@ export default function MedicineSearchPage() {
                                 </Select>
                             </div>
 
-                            {/* <div>
-                                <Label className="flex items-center justify-between font-medium">
-                                    임신 여부
-                                    <Switch checked={isPregnant} onCheckedChange={setIsPregnant} />
-                                </Label>
-                            </div> */}
-
                             <div className="space-y-1">
-                            <Label className="text-sm font-semibold text-gray-700">임신 여부</Label>
-                            <div className="flex gap-2">
-                                <Button
-                                type="button"
-                                variant={isPregnant ? "outline" : "default"}
-                                onClick={() => setIsPregnant(false)}
-                                >
-                                아니오
-                                </Button>
-                                <Button
-                                type="button"
-                                variant={isPregnant ? "default" : "outline"}
-                                onClick={() => setIsPregnant(true)}
-                                >
-                                예
-                                </Button>
-                            </div>
+                                <Label className="text-sm font-semibold text-black mb-2 block">임신 여부</Label>
+                                <div className="flex gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className={`border ${isPregnant ? "border-sky-300 text-black" : "text-gray-400"
+                                            }`}
+                                        onClick={() => setIsPregnant(true)}
+                                    >
+                                        예
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className={`border ${!isPregnant ? "border-sky-300 text-black" : "text-gray-400"
+                                            }`}
+                                        onClick={() => setIsPregnant(false)}
+                                    >
+                                        아니오
+                                    </Button>
+
+                                </div>
                             </div>
 
                             <div>
-                                <Label className="font-medium">피하고 싶은 질병</Label>
+                                <Label className="text-sm font-semibold text-black mb-2 block">피하고 싶은 질병</Label>
                                 <Input
+                                    className="text-black"
                                     placeholder="예: 간질환, 신장병"
                                     value={disease}
                                     onChange={(e) => setDisease(e.target.value)}
@@ -208,7 +207,7 @@ export default function MedicineSearchPage() {
                         <h2 className="text-2xl font-bold text-gray-700">📋 추천 의약품 목록</h2>
                         <div className="grid md:grid-cols-2 gap-6">
                             {result.map((med, idx) => (
-                                <Card key={idx} className="hover:shadow-xl transition-shadow border border-sky-100 rounded-xl">
+                                <Card key={idx} className="hover:shadow-xl transition-shadow border border-sky-400 rounded-xl">
                                     <CardContent className="p-6 space-y-3">
                                         <h3 className="text-xl font-semibold text-sky-800">{med.ph_nm_c} ({med.ph_c_nm})</h3>
                                         <p className="text-sm text-gray-600">✔️ 주요 효능: {med.ph_effect.slice(0, 100)}{med.ph_effect.length > 100 ? '...' : ''}</p>
@@ -219,11 +218,11 @@ export default function MedicineSearchPage() {
                                                 <TabsTrigger value="주의사항">⚠️ 주의사항</TabsTrigger>
                                                 <TabsTrigger value="부작용">🚫 부작용</TabsTrigger>
                                             </TabsList>
-                                            <TabsContent value="효능">{med.ph_effect}</TabsContent>
-                                            <TabsContent value="주의사항">
-                                                {med.ph_anti_warn || '정보 없음'}<br />{med.ph_warn || ''}
+                                            <TabsContent className="text-sm text-black mb-2 block" value="효능">{med.ph_effect}</TabsContent>
+                                            <TabsContent className="text-sm text-black mb-2 block" value="주의사항">
+                                                {med.ph_warn || '정보 없음'}<br />{med.ph_anti_warn || ''}
                                             </TabsContent>
-                                            <TabsContent value="부작용">{med.ph_s_effect || '정보 없음'}</TabsContent>
+                                            <TabsContent className="text-sm text-black mb-2 block" value="부작용">{med.ph_s_effect || '정보 없음'}</TabsContent>
                                         </Tabs>
                                     </CardContent>
                                 </Card>
