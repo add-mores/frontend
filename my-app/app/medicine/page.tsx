@@ -34,6 +34,7 @@ export default function MedicineSearchPage() {
     const handleSearchWithValue = async (symptomText: string) => {
         setLoading(true);
         try {
+
             // 1. insert API 호출
             const insertRes = await fetch("http://localhost:8000/api/insert", {
                 method: "POST",
@@ -74,13 +75,16 @@ export default function MedicineSearchPage() {
             alert("의약품 추천 중 문제가 발생했습니다.");
         }
         setLoading(false);
+
     };
 
     // 🔍 버튼 클릭용 핸들러
     const handleSearch = () => {
         handleSearchWithValue(symptoms);
     };
+
     return (
+
         <div className="min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
             <div className="max-w-6xl mx-auto space-y-16">
                 <div className="text-center">
@@ -243,5 +247,9 @@ export default function MedicineSearchPage() {
                 )}
             </div>
         </div>
+
+
+
     );
+
 }
