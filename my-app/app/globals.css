@@ -1,5 +1,5 @@
 /* app/globals.css */
-
+/* @import "tailwindcss"; */
 /* 1) Tailwind 기본 유틸리티 불러오기 */
 @tailwind base;
 @tailwind components;
@@ -95,6 +95,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
