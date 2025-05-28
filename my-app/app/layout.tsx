@@ -28,7 +28,7 @@ export default function RootLayout({
 
   return (
     // ← 이 파일이 app/ 폴더 바로 아래 layout.tsx 여야 합니다!
-    <html lang="ko" className="dark">
+    <html lang="ko">
       <head>
         {/* 네이버 지도 스크립트 */}
         <Script
