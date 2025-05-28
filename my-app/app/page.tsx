@@ -19,15 +19,15 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <Link href="/disease" className="block p-6 bg-white rounded-2xl shadow-md hover:scale-[1.02] transition-transform animate-fadein">
           <h3 className="text-xl font-semibold mb-2 text-black">🔍 질병 예측</h3>
-          <p className="text-gray-700">증상을 기반으로 유사한 질병을 추천합니다.</p>
+          <p className="text-gray-700">증상을 기반으로 유사한 질병을 예측합니다.</p>
         </Link>
         <Link href="/hospital" className="block p-6 bg-white rounded-2xl shadow-md hover:scale-[1.02] transition-transform animate-fadein">
           <h3 className="text-xl font-semibold mb-2 text-black">🏥 병원 찾기</h3>
-          <p className="text-gray-700">현 위치 또는 지역 기반 병원을 추천합니다.</p>
+          <p className="text-gray-700">현 위치 또는 지역 기반 병원 정보를 제공합니다.</p>
         </Link>
         <Link href="/medicine" className="block p-6 bg-white rounded-2xl shadow-md hover:scale-[1.02] transition-transform animate-fadein">
           <h3 className="text-xl font-semibold mb-2 text-black">💊 의약품 추천</h3>
-          <p className="text-gray-700">질병/증상에 맞는 의약품 정보를 제공합니다.</p>
+          <p className="text-gray-700">증상에 맞는 의약품 정보를 제공합니다.</p>
         </Link>
       </div>
 
