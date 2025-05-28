@@ -1,7 +1,7 @@
-export { Input } from './input'
-export { Button } from './button'
-export { Card, CardContent } from './card'
-export { Label } from './label'
-export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './select'
-export { Switch } from './switch'
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs'
+export * from './input';
+export * from './button';
+export * from './card';
+export * from './label';
+export * from './select';
+export * from './switch';
+export * from './tabs';
