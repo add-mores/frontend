@@ -7,11 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from 'next/navigation';
 
+import Link from "next/link";
+import { Menu } from "lucide-react";
+
 
 export default function DiseaseSearchPage() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState([]);
     const router = useRouter();
+
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     const handleSearch = async () => {
         if (!query.trim()) return;
@@ -64,7 +69,36 @@ export default function DiseaseSearchPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
+        <div className="relative min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
+            {/* Sidebar Toggle Button */}
+            <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className={`fixed top-4 left-4 z-50 transition-colors ${sidebarOpen ? "text-white" : "text-gray-800"}`}
+            >
+                <Menu className="w-6 h-6" />
+            </button>
+
+            {/* Sidebar */}
+            <div
+                className={`fixed top-0 left-0 h-full w-64 z-40 transform transition-transform duration-300 bg-gradient-to-br from-sky-500 to-sky-700 text-white px-6 pt-20 space-y-6 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}
+            >
+                <h2 className="text-2xl font-bold">메뉴</h2>
+                <nav className="space-y-4">
+                    <Link href="/" className="block hover:underline font-medium">
+                        🏠 홈
+                    </Link>
+                    <Link href="/disease" className="block hover:underline font-medium">
+                        🦠 질병
+                    </Link>
+                    <Link href="/hospital" className="block hover:underline font-medium">
+                        🏥 병원
+                    </Link>
+                    <Link href="/medicine" className="block hover:underline font-medium">
+                        💊 의약품
+                    </Link>
+                </nav>
+            </div>
             <div className="text-center">
                 <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 tracking-tight">🏥 질병 정보 서비스</h1>
                 <p className="mt-4 text-lg text-gray-600">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>

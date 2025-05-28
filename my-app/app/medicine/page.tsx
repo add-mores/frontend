@@ -9,6 +9,8 @@ import {
 import { Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import Link from "next/link";
+import { Menu } from "lucide-react";
 
 export default function MedicineSearchPage() {
     const [symptoms, setSymptoms] = useState('');
@@ -18,8 +20,11 @@ export default function MedicineSearchPage() {
     const [result, setResult] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
     const searchParams = useSearchParams();
     const initialQuery = searchParams.get('query');
+
 
     // 컴포넌트 mount 시, query가 있으면 자동 실행
     useEffect(() => {
@@ -84,7 +89,36 @@ export default function MedicineSearchPage() {
 
     return (
 
-        <div className="min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
+        <div className="relative min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
+            {/* Sidebar Toggle Button */}
+            <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className={`fixed top-4 left-4 z-50 transition-colors ${sidebarOpen ? "text-white" : "text-gray-800"}`}
+            >
+                <Menu className="w-6 h-6" />
+            </button>
+
+            {/* Sidebar */}
+            <div
+                className={`fixed top-0 left-0 h-full w-64 z-40 transform transition-transform duration-300 bg-gradient-to-br from-sky-500 to-sky-700 text-white px-6 pt-20 space-y-6 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}
+            >
+                <h2 className="text-2xl font-bold">메뉴</h2>
+                <nav className="space-y-4">
+                    <Link href="/" className="block hover:underline font-medium">
+                        🏠 홈
+                    </Link>
+                    <Link href="/disease" className="block hover:underline font-medium">
+                        🦠 질병
+                    </Link>
+                    <Link href="/hospital" className="block hover:underline font-medium">
+                        🏥 병원
+                    </Link>
+                    <Link href="/medicine" className="block hover:underline font-medium">
+                        💊 의약품
+                    </Link>
+                </nav>
+            </div>
             <div className="max-w-6xl mx-auto space-y-16">
                 <div className="text-center">
                     <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 tracking-tight">💊 의약품 추천 서비스</h1>
@@ -188,7 +222,7 @@ export default function MedicineSearchPage() {
                         </div>
 
                         <Button
-                            className="w-full mt-4 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-xl transition duration-300"
+                            className="w-full mt-4 bg-sky-400 hover:bg-sky-700 text-white font-semibold rounded-xl transition duration-300"
                             onClick={handleSearch}
                             disabled={loading}
                         >
