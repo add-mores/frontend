@@ -38,11 +38,6 @@ function SearchParamsHandler({ onDepartments }: { onDepartments: (queryDepts: st
 }
 
 export default function ClientHospital() {
-  // ─── URL 파라미터로 자동/수동 모드 결정 ───
-  //const searchParams = useSearchParams()
-  //const departmentsParam = searchParams.get('departments')
-  //const queryDepts = departmentsParam ? departmentsParam.split(',') : []
-
   // 상태 선언
   const [isAutoMode, setIsAutoMode] = useState(false)
   const [selectedDepts, setSelectedDepts] = useState<string[]>([])
@@ -64,7 +59,10 @@ export default function ClientHospital() {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const handleQueryDepts = (depts: string[]) => {
-    setSelectedDepts(depts)
+    if (depts.length > 0) {
+      setIsAutoMode(true)
+      setSelectedDepts(depts)
+    }
   }
 
   // 위치 조회 함수
@@ -91,26 +89,25 @@ export default function ClientHospital() {
   // debouncedName 처리
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedName(searchName)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [searchName])
+      if (location) fetchHospitals(selectedDepts);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [location, selectedDepts.join(','), debouncedName, radius]);
 
   // URL 쿼리로 진료과가 있으면 selectedDepts에 세팅
   // 위치가 준비되면 쿼리 있는 경우, deps 포함 검색 수행
   useEffect(() => {
-	  const hasQueryDepts = selectedDepts.length > 0
-
-  if (location) {
-    if (hasQueryDepts && isAutoMode) {
-      // 자동 모드일 때만
-      // 이미 selectedDepts가 세팅되어 있다고 가정
-    } else {
-      setSelectedDepts([])
-      setIsAutoMode(false)
+    if (location) {
+      if (selectedDepts.length > 0 && isAutoMode) {
+        // 자동모드일 때만 유지
+      } else if (!isAutoMode) {
+        // 수동모드면 selectedDepts 유지
+      } else {
+        setSelectedDepts([]);
+        setIsAutoMode(false);
+      }
     }
-  }
-}, [location, selectedDepts.join(',')])
+  }, [location, selectedDepts.join(',')]);
 
   // 병원 조회 함수
   const fetchHospitals = async (deps?: string[]) => {
@@ -138,7 +135,7 @@ export default function ClientHospital() {
   // 쿼리가 있으면 selectedDepts를 이용, 없으면 빈 배열로 호출해서 deps 없이 검색
   useEffect(() => {
     if (location) {
-      fetchHospitals(selectedDepts)
+      fetchHospitals(selectedDepts.length > 0 ? selectedDepts : [])
     }
   }, [location, selectedDepts, radius, debouncedName])
 
@@ -148,7 +145,8 @@ export default function ClientHospital() {
     try {
       const { data } = await axios.get(`${apiBase}/geocode`, { params: { query: searchAddress } })
       if (data.lat != null && data.lon != null) {
-        setLocation({ lat: data.lat, lon: data.lon, accuracy: 0 })
+        setLocation({ lat: data.lat, lon: data.lon, accuracy: 0 });
+        setSearchName(""); // 병원명 초기화
       } else {
         alert('주소를 찾을 수 없습니다.')
       }
