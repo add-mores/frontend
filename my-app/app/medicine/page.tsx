@@ -12,27 +12,40 @@ import { useEffect } from 'react';
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
+// 🔥 useSearchParams()을 별도 컴포넌트로 분리
+function SearchParamsHandler({ onQuery }: { onQuery: (query: string) => void }) {
+    const searchParams = useSearchParams();
+    const query = searchParams.get('query');
+
+    useEffect(() => {
+        if (query) onQuery(query);
+    }, [query]);
+
+    return null;
+}
+
+
 export default function MedicineSearchPage() {
     const [symptoms, setSymptoms] = useState('');
     const [ageGroup, setAgeGroup] = useState('');
     const [isPregnant, setIsPregnant] = useState(false);
     const [disease, setDisease] = useState('');
-    const [result, setResult] = useState([]);
+    const [result, setResult] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const searchParams = useSearchParams();
-    const initialQuery = searchParams.get('query');
+    //const searchParams = useSearchParams();
+    //const initialQuery = searchParams.get('query');
 
 
     // 컴포넌트 mount 시, query가 있으면 자동 실행
-    useEffect(() => {
-        if (initialQuery) {
-            setSymptoms(initialQuery);
-            handleSearchWithValue(initialQuery);
-        }
-    }, [initialQuery]);
+    //useEffect(() => {
+        //if (initialQuery) {
+            //setSymptoms(initialQuery);
+            //handleSearchWithValue(initialQuery);
+        //}
+    //}, [initialQuery]);
 
     // insert API → positive → medicine API
     const handleSearchWithValue = async (symptomText: string) => {

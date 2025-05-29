@@ -1,12 +1,13 @@
 // components/NaverMap.tsx
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
+import type { Hospital } from '@/types';
 
 export interface NaverMapHandle {
   panTo: (pos: { lat: number, lng: number }, opts?: any) => void
 }
 
 type LatLng = { lat: number, lon: number }
-type Hospital = { hos_nm: string; lat: number; lon: number }
+//type Hospital_nm = { hos_nm: string; lat: number; lon: number }
 
 interface Props {
   center: LatLng
@@ -14,6 +15,7 @@ interface Props {
   userLocation?: LatLng
   selectedHos?: string
   onMarkerClick?: (h: Hospital) => void
+  className: string;
 }
 
 const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
@@ -88,7 +90,8 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
     }
   }))
 
-  return <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+  //return <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+  return <div ref={mapRef} className={props.className} />
 })
 
 export default NaverMap

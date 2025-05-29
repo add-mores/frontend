@@ -1,7 +1,8 @@
 // app/hospital/ClientHospital.tsx
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import type { Hospital } from '@/types';
+import React, { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import axios from 'axios'
@@ -23,11 +24,24 @@ interface Hospital {
   distance: number  // 거리(km)
 }
 
-export default function ClientHospital() {
-  // ─── URL 파라미터로 자동/수동 모드 결정 ───
+// 🔥 useSearchParams()을 별도 컴포넌트로 분리
+function SearchParamsHandler({ onDepartments }: { onDepartments: (queryDepts: string[]) => void }) {
   const searchParams = useSearchParams()
   const departmentsParam = searchParams.get('departments')
   const queryDepts = departmentsParam ? departmentsParam.split(',') : []
+
+  useEffect(() => {
+    onDepartments(queryDepts)
+  }, [departmentsParam])
+
+  return null
+}
+
+export default function ClientHospital() {
+  // ─── URL 파라미터로 자동/수동 모드 결정 ───
+  //const searchParams = useSearchParams()
+  //const departmentsParam = searchParams.get('departments')
+  //const queryDepts = departmentsParam ? departmentsParam.split(',') : []
 
   // 상태 선언
   const [isAutoMode, setIsAutoMode] = useState(false)
@@ -49,6 +63,9 @@ export default function ClientHospital() {
 
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+  const handleQueryDepts = (depts: string[]) => {
+    setSelectedDepts(depts)
+  }
 
   // 위치 조회 함수
   const getLocation = () => {
@@ -82,18 +99,18 @@ export default function ClientHospital() {
   // URL 쿼리로 진료과가 있으면 selectedDepts에 세팅
   // 위치가 준비되면 쿼리 있는 경우, deps 포함 검색 수행
   useEffect(() => {
-    const hasQueryDepts = queryDepts.length > 0
+	  const hasQueryDepts = selectedDepts.length > 0
 
-    if (location) {
-      if (hasQueryDepts) {
-        setSelectedDepts(queryDepts)
-        setIsAutoMode(true)  // ✅ URL에 진료과가 있으면 auto 모드 ON
-      } else {
-        setSelectedDepts([])
-        setIsAutoMode(false) // ❌ 없으면 auto 모드 OFF
-      }
+  if (location) {
+    if (hasQueryDepts && isAutoMode) {
+      // 자동 모드일 때만
+      // 이미 selectedDepts가 세팅되어 있다고 가정
+    } else {
+      setSelectedDepts([])
+      setIsAutoMode(false)
     }
-  }, [location, queryDepts.join(',')])
+  }
+}, [location, selectedDepts.join(',')])
 
   // 병원 조회 함수
   const fetchHospitals = async (deps?: string[]) => {
@@ -152,6 +169,11 @@ export default function ClientHospital() {
   }
 
   return (
+	  <>
+	  {/* 🔥 SearchParamsHandler 렌더링 */}
+	  <Suspense fallback={null}>
+	  	<SearchParamsHandler onDepartments={handleQueryDepts} />
+	</Suspense>
     <div className="relative min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
       {/* Sidebar Toggle Button */}
       <button
@@ -399,5 +421,6 @@ export default function ClientHospital() {
 
       </div>
     </div>
+    </>
   )
 }

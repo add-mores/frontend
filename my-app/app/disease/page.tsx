@@ -13,7 +13,7 @@ import { Menu } from "lucide-react";
 
 export default function DiseaseSearchPage() {
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<any[]>([]);
     const router = useRouter();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -57,7 +57,7 @@ export default function DiseaseSearchPage() {
         // 쉼표 기준으로 분리 → 공백/특수문자 제거 → 중복 제거
         const allDepartments = results.flatMap(item =>
             item.department
-                ? item.department.split(",").map(dept => dept.trim().replace(/[^\w가-힣]/g, "")) // 한글+영문, 특수문자 제거
+                ? item.department.split(",").map((dept: string) => dept.trim().replace(/[^\w가-힣]/g, "")) // 한글+영문, 특수문자 제거
                 : []
         );
 
