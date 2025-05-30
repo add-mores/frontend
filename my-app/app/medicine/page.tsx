@@ -7,7 +7,7 @@ import {
 } from '@/components/ui';
 import { Loader2, Menu } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { Suspense, useState, useEffect, useCallback } from 'react';
 import Link from "next/link";
 
 // 별도 컴포넌트에서 query 파라미터를 받아 부모 콜백 호출
@@ -94,8 +94,9 @@ export default function MedicineSearchPage() {
 
     return (
         <>
+	<Suspense fallback={<div>로딩 중...</div>}>
             <SearchParamsHandler onQuery={handleQuery} />
-
+	    </Suspense>
             <div className="relative min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
                 {/* Sidebar Toggle Button */}
                 <button
