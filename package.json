@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "lucide-react": "^0.511.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21"
+  }
+}
