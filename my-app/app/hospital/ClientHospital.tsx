@@ -388,7 +388,7 @@ export default function ClientHospital() {
                     <div className="flex space-x-2">
                       {/* 지도 링크 버튼 */}
                       <a
-                        href={`kakaomap://look?p=${h.lat},${h.lon}`}
+                        href={`https://map.kakao.com/link/map/${encodeURIComponent(h.hos_nm)},${h.lat},${h.lon}`}
                         target="_blank"
                         className="px-2 py-1 bg-yellow-400 rounded-full text-xs"
                       >
