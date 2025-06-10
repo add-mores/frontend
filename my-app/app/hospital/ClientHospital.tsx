@@ -164,7 +164,7 @@ if (Array.isArray(recs)) {
   const mapRef = useRef<any>(null)
   const onSelect = (h: Hospital) => {
     setSelectedHospital(h)
-    mapRef.current?.panTo({ lat: h.lat, lng: h.lon }, { duration: 500 })
+    mapRef.current?.panTo({ lat: h.lat, lon: h.lon }, { duration: 500 })
   }
   const onCopy = (t: string) => {
     navigator.clipboard.writeText(t)
@@ -387,7 +387,9 @@ if (Array.isArray(recs)) {
                     </button>
                   </div>
                   <p className="mt-1 text-sm text-gray-600">{h.add}</p>
-                  <p className="mt-1 text-sm text-gray-600">{h.deps}</p>
+                  <p className="mt-1 text-sm text-gray-600">
+                    {Array.isArray(h.deps) ? h.deps.join(', ') : h.deps}
+                  </p>
                   <div className="mt-2 flex justify-between items-center">
                     <span className="text-blue-600 font-medium">{h.distance.toFixed(2)}km</span>
                     <div className="flex space-x-2">

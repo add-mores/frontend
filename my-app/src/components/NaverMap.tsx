@@ -63,17 +63,22 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
       })
            // ➌ 클릭 시 InfoWindow 열기 & onMarkerClick 호출
      m.addListener('click', () => {
-       const content = `
-         <div style="padding:8px;min-width:140px;">
-           <strong>${h.hos_nm}</strong><br/>
-           <small>${h.add}</small>
-         </div>
-       `
-       infoWindowRef.current.open(mapInst.current, m)
+          const content = `
+       <div style="
+         padding: 8px;
+         min-width: 140px;
+         background-color: #fff;   /* 배경 흰색 */
+         color: #000;              /* 글자 검정색 */
+         font-size: 14px;
+       ">
+         <strong style="color:#000">${h.hos_nm}</strong><br/>
+         <small style="color:#333">${h.add}</small>
+      </div>
+      `
        infoWindowRef.current.setContent(content)
+       infoWindowRef.current.open(mapInst.current, m)
        onMarkerClick?.(h)
      })
-      m.addListener('click', () => onMarkerClick?.(h))
       markers.current[h.hos_nm] = m
     })
   }, [hospitals, onMarkerClick])
