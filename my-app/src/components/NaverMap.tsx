@@ -25,6 +25,9 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
   const markers = useRef<Record<string, any>>({})
   const userMarker = useRef<any>(null)
 
+   // ➊ InfoWindow 레퍼런스
+ const infoWindowRef = useRef<any>(null)
+
   // 1) 지도 초기화
   useEffect(() => {
     if (!mapRef.current || !window.naver?.maps) return
@@ -33,6 +36,8 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
         center: new window.naver.maps.LatLng(center.lat, center.lon),
         zoom: 15,
       })
+           // ➋ InfoWindow 초기화
+     infoWindowRef.current = new window.naver.maps.InfoWindow({ anchorSkew: true })
     }
   }, [])
 
@@ -56,6 +61,18 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
         map: mapInst.current,
         title: h.hos_nm,
       })
+           // ➌ 클릭 시 InfoWindow 열기 & onMarkerClick 호출
+     m.addListener('click', () => {
+       const content = `
+         <div style="padding:8px;min-width:140px;">
+           <strong>${h.hos_nm}</strong><br/>
+           <small>${h.add}</small>
+         </div>
+       `
+       infoWindowRef.current.open(mapInst.current, m)
+       infoWindowRef.current.setContent(content)
+       onMarkerClick?.(h)
+     })
       m.addListener('click', () => onMarkerClick?.(h))
       markers.current[h.hos_nm] = m
     })

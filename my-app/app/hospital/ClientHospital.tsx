@@ -122,8 +122,13 @@ export default function ClientHospital() {
         search_name: debouncedName || undefined,
         deps: deps && deps.length > 0 ? deps : undefined,
       }
-      const res = await axios.post<Hospital[]>(`${apiBase}/api/hospital`, params)
-      setHospitals(res.data)
+      const res = await axios.post(`${apiBase}/api/hospital`, params)
+const recs = res.data?.recommendations
+if (Array.isArray(recs)) {
+  setHospitals(recs)
+} else {
+  setHospitals([])
+}
     } catch (e: any) {
       setError(e.message || '병원 조회 중 오류가 발생했습니다.')
     } finally {
