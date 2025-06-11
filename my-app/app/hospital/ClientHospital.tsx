@@ -112,6 +112,11 @@ export default function ClientHospital() {
   // 병원 조회 함수
   const fetchHospitals = async (deps?: string[]) => {
     if (!location) return
+    // deps 가 반드시 있어야 API 호출 (빈 배열일 때는 호출 중단)
+    if (!deps || deps.length === 0) {
+      setHospitals([])    // 선택 모드라면 빈 리스트로 초기화
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -120,7 +125,7 @@ export default function ClientHospital() {
         lon: location.lon,
         radius,
         search_name: debouncedName || undefined,
-        deps: deps && deps.length > 0 ? deps : undefined,
+        deps,
       }
       const res = await axios.post(`${apiBase}/api/hospital`, params)
 const recs = res.data?.recommendations
@@ -139,8 +144,8 @@ if (Array.isArray(recs)) {
   // 위치가 세팅되고 selectedDepts가 변할 때 병원 검색
   // 쿼리가 있으면 selectedDepts를 이용, 없으면 빈 배열로 호출해서 deps 없이 검색
   useEffect(() => {
-    if (location) {
-      fetchHospitals(selectedDepts.length > 0 ? selectedDepts : [])
+    if (location && selectedDepts.length > 0) {
+      fetchHospitals(selectedDepts)
     }
   }, [location, selectedDepts, radius, debouncedName])
 
