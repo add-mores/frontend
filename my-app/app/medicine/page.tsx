@@ -94,9 +94,9 @@ export default function MedicineSearchPage() {
 
     return (
         <>
-	<Suspense fallback={<div>로딩 중...</div>}>
-            <SearchParamsHandler onQuery={handleQuery} />
-	    </Suspense>
+            <Suspense fallback={<div>로딩 중...</div>}>
+                <SearchParamsHandler onQuery={handleQuery} />
+            </Suspense>
             <div className="relative min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
                 {/* Sidebar Toggle Button */}
                 <button
@@ -124,6 +124,9 @@ export default function MedicineSearchPage() {
                         </Link>
                         <Link href="/medicine" className="block hover:underline font-medium">
                             💊 의약품
+                        </Link>
+                        <Link href="/chatbot" className="block hover:underline font-medium">
+                            📱 AI챗봇
                         </Link>
                     </nav>
                 </div>

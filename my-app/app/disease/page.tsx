@@ -97,6 +97,9 @@ export default function DiseaseSearchPage() {
                     <Link href="/medicine" className="block hover:underline font-medium">
                         💊 의약품
                     </Link>
+                    <Link href="/chatbot" className="block hover:underline font-medium">
+                        📱 AI챗봇
+                    </Link>
                 </nav>
             </div>
             <div className="text-center">
