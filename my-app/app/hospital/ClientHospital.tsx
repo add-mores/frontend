@@ -11,6 +11,11 @@ import { CopyIcon, Clipboard } from 'lucide-react'
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
+//챗봇
+import { Bot } from 'lucide-react' // lucide 아이콘 사용
+import ChatModal from '@/components/ChatModal' // 챗봇 모달 컴포넌트
+import ChatWidget from '@/components/ChatWidget'
+
 
 // SSR을 피하기 위해 동적으로 불러오는 네이버 지도 컴포넌트
 const NaverMap = dynamic(() => import('@/components/NaverMap'), { ssr: false })
@@ -57,6 +62,9 @@ export default function ClientHospital() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  //챗봇
+  const [isOpen, setIsOpen] = useState(false)
 
   const handleQueryDepts = (depts: string[]) => {
     if (depts.length > 0) {
@@ -205,6 +213,13 @@ export default function ClientHospital() {
             </Link>
           </nav>
         </div>
+
+        {/* 우측 하단 챗봇 */}
+        <ChatWidget apiEndpoint="/api/chat/hospital" />
+
+        {/* 챗봇 질문 모달 */}
+        {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
+
         <div className="max-w-6xl mx-auto space-y-16">
 
           {/* ─── 헤더 ─── */}
