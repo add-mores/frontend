@@ -10,6 +10,11 @@ import { useSearchParams } from 'next/navigation';
 import React, { Suspense, useState, useEffect, useCallback } from 'react';
 import Link from "next/link";
 
+//챗봇
+import { Bot } from 'lucide-react' // lucide 아이콘 사용
+import ChatModal from '@/components/ChatModal' // 챗봇 모달 컴포넌트
+import ChatWidget from '@/components/ChatWidget'
+
 // 별도 컴포넌트에서 query 파라미터를 받아 부모 콜백 호출
 function SearchParamsHandler({ onQuery }: { onQuery: (query: string) => void }) {
     const searchParams = useSearchParams();
@@ -31,6 +36,9 @@ export default function MedicineSearchPage() {
     const [loading, setLoading] = useState(false);
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    //챗봇
+    const [isOpen, setIsOpen] = useState(false)
 
     // 검색 함수는 useCallback + 모든 의존성 명시
     const handleSearchWithValue = useCallback(async (symptomText: string) => {
@@ -94,9 +102,9 @@ export default function MedicineSearchPage() {
 
     return (
         <>
-	<Suspense fallback={<div>로딩 중...</div>}>
-            <SearchParamsHandler onQuery={handleQuery} />
-	    </Suspense>
+            <Suspense fallback={<div>로딩 중...</div>}>
+                <SearchParamsHandler onQuery={handleQuery} />
+            </Suspense>
             <div className="relative min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
                 {/* Sidebar Toggle Button */}
                 <button
@@ -125,8 +133,17 @@ export default function MedicineSearchPage() {
                         <Link href="/medicine" className="block hover:underline font-medium">
                             💊 의약품
                         </Link>
+                        <Link href="/chatbot" className="block hover:underline font-medium">
+                            📱 AI챗봇
+                        </Link>
                     </nav>
                 </div>
+
+                {/* 우측 하단 챗봇 */}
+                <ChatWidget apiEndpoint="/api/chat/medicine" />
+
+                {/* 챗봇 질문 모달 */}
+                {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
 
                 <div className="max-w-6xl mx-auto space-y-16">
                     <div className="text-center">
