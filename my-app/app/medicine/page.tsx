@@ -140,7 +140,7 @@ export default function MedicineSearchPage() {
                 </div>
 
                 {/* 우측 하단 챗봇 */}
-                <ChatWidget apiEndpoint="/api/chat/medicine" />
+                <ChatWidget apiEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/llm/medicine`} />
 
                 {/* 챗봇 질문 모달 */}
                 {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}

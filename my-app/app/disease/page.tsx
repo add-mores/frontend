@@ -116,7 +116,7 @@ export default function DiseaseSearchPage() {
             </div>
 
             {/* 우측 하단 챗봇 */}
-            <ChatWidget apiEndpoint="/api/chat/disease" />
+            <ChatWidget apiEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/llm/disease`} />
 
             {/* 챗봇 질문 모달 */}
             {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}

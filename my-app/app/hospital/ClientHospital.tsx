@@ -215,7 +215,7 @@ export default function ClientHospital() {
         </div>
 
         {/* 우측 하단 챗봇 */}
-        <ChatWidget apiEndpoint="/api/chat/hospital" />
+        <ChatWidget apiEndpoint="/llm/hospital" />
 
         {/* 챗봇 질문 모달 */}
         {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
