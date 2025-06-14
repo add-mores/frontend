@@ -12,8 +12,6 @@ import Link from "next/link";
 import { Menu } from "lucide-react";
 
 //챗봇
-import { Bot } from 'lucide-react' // lucide 아이콘 사용
-import ChatModal from '@/components/ChatModal' // 챗봇 모달 컴포넌트
 import ChatWidget from '@/components/ChatWidget'
 
 
@@ -63,8 +61,6 @@ export default function ClientHospital() {
 
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  //챗봇
-  const [isOpen, setIsOpen] = useState(false)
 
   const handleQueryDepts = (depts: string[]) => {
     if (depts.length > 0) {
@@ -212,16 +208,15 @@ export default function ClientHospital() {
         </nav>
       </div>
 
-      {/* 우측 하단 챗봇 */}
-      <ChatWidget apiEndpoint="/api/chat/hospital" />
-
-      {/* 챗봇 질문 모달 */}
-      {isOpen && (
-        <ChatModal
-          onClose={() => setIsOpen(false)}
-          apiEndpoint="/api/chat/hospital"
-        />
-      )}
+      {/* 우측 하단 챗봇 — 현재 위치와 radius 를 함께 넘겨줌 */}
+   {location && (
+   <ChatWidget
+     // ← 여기를 절대 URL(또는 NEXT_PUBLIC_API_BASE_URL 기준) 로 바꿔 줍니다.
+     apiEndpoint={`${apiBase}/llm/hospital`}
+     location={location}
+     radius={radius}
+   />
+ )}
 
       <div className="max-w-6xl mx-auto space-y-16">
         {/* ─── 헤더 ─── */}

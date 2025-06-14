@@ -4,17 +4,29 @@ import { useState } from 'react'
 import { MessageCircle } from 'lucide-react'
 import ChatModal from './ChatModal'
 
-interface ChatButtonProps {
-    apiEndpoint: string;
-}
+ interface ChatWidgetProps {
+   apiEndpoint: string;
+   location: { lat: number; lon: number; accuracy?: number };
+   radius: number;
+ }
 
-export default function ChatWidget({ apiEndpoint }: ChatButtonProps) {
+export default function ChatWidget({
+  apiEndpoint,
+  location,
+  radius
+}: ChatWidgetProps) {
     const [open, setOpen] = useState(false)
 
     return (
         <>
-            {open && (<ChatModal onClose={() => setOpen(false)}
-                apiEndpoint={apiEndpoint} />)}
+             {open && (
+   <ChatModal
+     onClose={() => setOpen(false)}
+     apiEndpoint={apiEndpoint}
+     location={location}
+     radius={radius}
+   />
+ )}
             <button
                 onClick={() => setOpen(!open)}
                 className="fixed bottom-4 right-4 z-50 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg"

@@ -3,12 +3,19 @@
 import { useState, useRef, useEffect } from 'react'
 import { X } from 'lucide-react'
 
-interface ChatModalProps {
-    onClose: () => void;
-    apiEndpoint: string;
-}
+ interface ChatModalProps {
+   onClose: () => void;
+   apiEndpoint: string;
+   location: { lat: number; lon: number; accuracy?: number };
+   radius: number;
+ }
 
-export default function ChatModal({ onClose }: ChatModalProps) {
+export default function ChatModal({
+  onClose,
+  apiEndpoint,
+  location,
+  radius
+}: ChatModalProps) {
     const [question, setQuestion] = useState('')
     const [messages, setMessages] = useState<{ type: 'user' | 'bot', text: string }[]>([])
     const [loading, setLoading] = useState(false)
@@ -24,14 +31,24 @@ export default function ChatModal({ onClose }: ChatModalProps) {
         setLoading(true)
 
         try {
-            const res = await fetch(apiEndpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: userMessage.text }),
-            })
+                     const res = await fetch(apiEndpoint, {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({
+             query: userMessage.text,
+             lat: location.lat,
+             lon: location.lon,
+             radius
+           }),
+         })
 
-            const data = await res.json()
-            setMessages((prev) => [...prev, { type: 'bot', text: data.answer }])
+    const data = await res.json()
+    // llm_summary 배열을 문자열로 가공
+    const summary = data.llm_summary
+    const botText = Array.isArray(summary)
+      ? summary.map(item => `${item.hos_nm}: ${item.reason}`).join('\n')
+      : '⚠️ 예상치 못한 응답 형식입니다.'
+    setMessages((prev) => [...prev, { type: 'bot', text: botText }])
         } catch (err) {
             setMessages((prev) => [...prev, { type: 'bot', text: '⚠️ 오류가 발생했습니다.' }])
         } finally {
