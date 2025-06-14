@@ -8,12 +8,14 @@ import ChatModal from './ChatModal'
    apiEndpoint: string;
    location: { lat: number; lon: number; accuracy?: number };
    radius: number;
+   onReRequestLocation: () => void;
  }
 
 export default function ChatWidget({
   apiEndpoint,
   location,
-  radius
+  radius,
+  onReRequestLocation  
 }: ChatWidgetProps) {
     const [open, setOpen] = useState(false)
 
@@ -25,6 +27,7 @@ export default function ChatWidget({
      apiEndpoint={apiEndpoint}
      location={location}
      radius={radius}
+     onReRequestLocation={onReRequestLocation}
    />
  )}
             <button
