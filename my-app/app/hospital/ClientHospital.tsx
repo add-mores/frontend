@@ -117,27 +117,30 @@ export default function ClientHospital() {
     }
   }, [location, selectedDepts.join(',')]);
 
+  console.log("✅ apiBase:", apiBase)
   // 병원 조회 함수
   const fetchHospitals = async (deps?: string[]) => {
-    if (!location) return
-    setLoading(true)
-    setError(null)
-    try {
-      const params = {
-        lat: location.lat,
-        lon: location.lon,
-        radius,
-        search_name: debouncedName || undefined,
-        deps: deps && deps.length > 0 ? deps : undefined,
-      }
-      const res = await axios.post<Hospital[]>(`${apiBase}/api/hospital`, params)
-      setHospitals(res.data)
-    } catch (e: any) {
-      setError(e.message || '병원 조회 중 오류가 발생했습니다.')
-    } finally {
-      setLoading(false)
+  if (!location) return
+  setLoading(true)
+  setError(null)
+  try {
+    const params = {
+      lat: location.lat,
+      lon: location.lon,
+      radius,
+      search_name: debouncedName || undefined,
+      deps: deps && deps.length > 0 ? deps : undefined,
     }
+
+    const res = await axios.post(`${apiBase}/api/hospital`, params)
+    setHospitals(res.data.recommendations ?? [])
+  } catch (e: any) {
+    setError(e.message || '병원 조회 중 오류가 발생했습니다.')
+  } finally {
+    setLoading(false)
   }
+}
+
 
   // 위치가 세팅되고 selectedDepts가 변할 때 병원 검색
   // 쿼리가 있으면 selectedDepts를 이용, 없으면 빈 배열로 호출해서 deps 없이 검색
