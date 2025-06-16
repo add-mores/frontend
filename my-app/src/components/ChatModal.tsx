@@ -8,7 +8,7 @@ interface ChatModalProps {
     apiEndpoint: string;
 }
 
-export default function ChatModal({ onClose }: ChatModalProps) {
+export default function ChatModal({ onClose, apiEndpoint }: ChatModalProps) {
     const [question, setQuestion] = useState('')
     const [messages, setMessages] = useState<{ type: 'user' | 'bot', text: string }[]>([])
     const [loading, setLoading] = useState(false)
