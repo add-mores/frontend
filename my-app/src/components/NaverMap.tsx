@@ -1,13 +1,12 @@
 // components/NaverMap.tsx
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import type { Hospital } from '@/types';
+import type { Hospital } from '@/types'
 
 export interface NaverMapHandle {
-  panTo: (pos: { lat: number, lng: number }, opts?: any) => void
+  panTo: (pos: { lat: number, lng: number }, opts?: any, hosNm?: string) => void
 }
 
 type LatLng = { lat: number, lon: number }
-//type Hospital_nm = { hos_nm: string; lat: number; lon: number }
 
 interface Props {
   center: LatLng
@@ -15,17 +14,17 @@ interface Props {
   userLocation?: LatLng
   selectedHos?: string
   onMarkerClick?: (h: Hospital) => void
-  className: string;
+  className: string
 }
 
 const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
-  const { center, hospitals, userLocation, selectedHos, onMarkerClick} = props
+  const { center, hospitals, userLocation, selectedHos, onMarkerClick } = props
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInst = useRef<any>(null)
   const markers = useRef<Record<string, any>>({})
   const userMarker = useRef<any>(null)
+  const infoWindowRef = useRef<any>(null)
 
-  // 1) 지도 초기화
   useEffect(() => {
     if (!mapRef.current || !window.naver?.maps) return
     if (!mapInst.current) {
@@ -33,19 +32,16 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
         center: new window.naver.maps.LatLng(center.lat, center.lon),
         zoom: 15,
       })
+      infoWindowRef.current = new window.naver.maps.InfoWindow({ anchorSkew: true })
     }
   }, [])
 
-  // 2) center 변경 시
   useEffect(() => {
     if (mapInst.current) {
-      mapInst.current.setCenter(
-        new window.naver.maps.LatLng(center.lat, center.lon)
-      )
+      mapInst.current.setCenter(new window.naver.maps.LatLng(center.lat, center.lon))
     }
   }, [center.lat, center.lon])
 
-  // 3) 병원 마커 렌더링
   useEffect(() => {
     if (!mapInst.current) return
     Object.values(markers.current).forEach(m => m.setMap(null))
@@ -56,18 +52,30 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
         map: mapInst.current,
         title: h.hos_nm,
       })
-      m.addListener('click', () => onMarkerClick?.(h))
+      m.addListener('click', () => {
+        const content = `
+          <div style="
+            padding: 8px;
+            min-width: 140px;
+            background-color: #fff;
+            color: #000;
+            font-size: 14px;
+          ">
+            <strong>${h.hos_nm}</strong><br/>
+            <small>${h.add}</small>
+          </div>
+        `
+        infoWindowRef.current.setContent(content)
+        infoWindowRef.current.open(mapInst.current, m)
+        onMarkerClick?.(h)
+      })
       markers.current[h.hos_nm] = m
     })
   }, [hospitals, onMarkerClick])
 
-  // 4) 내 위치 빨간 마커 렌더링
   useEffect(() => {
     if (!mapInst.current || !userLocation) return
-    console.log('▶ userLocation useEffect:', userLocation)
-    // 이전 마커 제거
     userMarker.current?.setMap(null)
-    // 새로운 빨간 마커 생성
     userMarker.current = new window.naver.maps.Marker({
       map: mapInst.current,
       position: new window.naver.maps.LatLng(userLocation.lat, userLocation.lon),
@@ -79,18 +87,33 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
     })
   }, [userLocation])
 
-
-  // 6) 외부 panTo
   useImperativeHandle(ref, () => ({
-    panTo(pos, opts) {
-      mapInst.current?.panTo(
-        new window.naver.maps.LatLng(pos.lat, pos.lng),
-        opts
-      )
+    panTo(pos, opts, hosNm) {
+      const latLng = new window.naver.maps.LatLng(pos.lat, pos.lng)
+      mapInst.current?.panTo(latLng, opts)
+
+      if (hosNm && markers.current[hosNm]) {
+        const h = hospitals.find(h => h.hos_nm === hosNm)
+        if (h) {
+          const content = `
+            <div style="
+              padding: 8px;
+              min-width: 140px;
+              background-color: #fff;
+              color: #000;
+              font-size: 14px;
+            ">
+              <strong>${h.hos_nm}</strong><br/>
+              <small>${h.add}</small>
+            </div>
+          `
+          infoWindowRef.current.setContent(content)
+          infoWindowRef.current.open(mapInst.current, markers.current[hosNm])
+        }
+      }
     }
   }))
 
-  //return <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
   return <div ref={mapRef} className={props.className} />
 })
 

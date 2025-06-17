@@ -21,12 +21,14 @@ import ChatWidget from '@/components/ChatWidget'
 const NaverMap = dynamic(() => import('@/components/NaverMap'), { ssr: false })
 
 interface Hospital {
-  hos_nm: string  // 병원 이름
-  add: string  // 주소
-  deps: string  // 진료과
-  lat: number  // 위도
-  lon: number  // 경도
-  distance: number  // 거리(km)
+  hos_nm: string
+  add: string
+  deps: string
+  lat: number
+  lon: number
+  distance: number
+  emer: string              // ← 여기
+  emer_phone?: string        // ← 여기
 }
 
 // 🔥 useSearchParams()을 별도 컴포넌트로 분리
@@ -117,29 +119,27 @@ export default function ClientHospital() {
     }
   }, [location, selectedDepts.join(',')]);
 
-  console.log("✅ apiBase:", apiBase)
-  // 병원 조회 함수
   const fetchHospitals = async (deps?: string[]) => {
-  if (!location) return
-  setLoading(true)
-  setError(null)
-  try {
-    const params = {
-      lat: location.lat,
-      lon: location.lon,
-      radius,
-      search_name: debouncedName || undefined,
-      deps: deps && deps.length > 0 ? deps : undefined,
-    }
+    if (!location) return
+    setLoading(true)
+    setError(null)
+    try {
+      const params = {
+        lat: location.lat,
+        lon: location.lon,
+        radius,
+        search_name: debouncedName || undefined,
+        deps: deps && deps.length > 0 ? deps : undefined,
+      }
 
-    const res = await axios.post(`${apiBase}/api/hospital`, params)
-    setHospitals(res.data.recommendations ?? [])
-  } catch (e: any) {
-    setError(e.message || '병원 조회 중 오류가 발생했습니다.')
-  } finally {
-    setLoading(false)
+      const res = await axios.post(`${apiBase}/api/hospital`, params)
+      setHospitals(res.data.recommendations ?? [])
+    } catch (e: any) {
+      setError(e.message || '병원 조회 중 오류가 발생했습니다.')
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
 
   // 위치가 세팅되고 selectedDepts가 변할 때 병원 검색
@@ -170,7 +170,7 @@ export default function ClientHospital() {
   const mapRef = useRef<any>(null)
   const onSelect = (h: Hospital) => {
     setSelectedHospital(h)
-    mapRef.current?.panTo({ lat: h.lat, lng: h.lon }, { duration: 500 })
+    mapRef.current?.panTo({ lat: h.lat, lng: h.lon }, { duration: 500 }, h.hos_nm)
   }
   const onCopy = (t: string) => {
     navigator.clipboard.writeText(t)
@@ -216,13 +216,6 @@ export default function ClientHospital() {
             </Link>
           </nav>
         </div>
-
-        {/* 우측 하단 챗봇 */}
-        <ChatWidget apiEndpoint="/llm/hospital" />
-
-        {/* 챗봇 질문 모달 */}
-        {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
-
         <div className="max-w-6xl mx-auto space-y-16">
 
           {/* ─── 헤더 ─── */}
@@ -391,44 +384,40 @@ export default function ClientHospital() {
                     key={h.hos_nm}
                     onClick={() => onSelect(h)}
                     className={`
-                    mb-3 p-3 rounded-lg cursor-pointer
-                    ${selectedHospital?.hos_nm === h.hos_nm ? 'ring-2 ring-blue-500' : 'ring-1 ring-gray-200'}
-                    hover:shadow-md
-                  `}
+    relative mb-4 p-4 rounded-2xl cursor-pointer transition-all duration-200
+    bg-white shadow-lg hover:shadow-xl
+    border ${selectedHospital?.hos_nm === h.hos_nm ? 'border-blue-500' : 'border-gray-200'}
+  `}
                   >
+
                     <div className="flex justify-between items-center">
-                      <h3 className="font-semibold text-black">{h.hos_nm}</h3>
+                      <h3 className="font-semibold text-black text-base">{h.hos_nm}</h3>
                       <button onClick={() => onCopy(h.hos_nm)}>
-                        <CopyIcon className="w-5 h-5 text-gray-500" />
+                        <CopyIcon className="w-5 h-5 text-gray-400 hover:text-gray-600" />
                       </button>
                     </div>
+
                     <p className="mt-1 text-sm text-gray-600">{h.add}</p>
                     <p className="mt-1 text-sm text-gray-600">{h.deps}</p>
-                    <div className="mt-2 flex justify-between items-center">
+
+                    {h.emer?.trim() === "있음" && (
+                      <p className="mt-2 text-sm text-red-600 font-medium">
+                        🆘 응급실 운영중
+                        {h.emer_phone && (
+                          <>
+                            {" · "}
+                            <span className="text-blue-600 font-semibold">☎ {h.emer_phone}</span>
+                          </>
+                        )}
+                      </p>
+                    )}
+
+                    <div className="mt-3 flex justify-between items-center">
                       <span className="text-blue-600 font-medium">{h.distance.toFixed(2)}km</span>
                       <div className="flex space-x-2">
-                        {/* 지도 링크 버튼 */}
-                        <a
-                          href={`kakaomap://look?p=${h.lat},${h.lon}`}
-                          target="_blank"
-                          className="px-2 py-1 bg-yellow-400 rounded-full text-xs"
-                        >
-                          Kakao
-                        </a>
-                        <a
-                          href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`}
-                          target="_blank"
-                          className="px-2 py-1 bg-green-600 text-white rounded-full text-xs"
-                        >
-                          Naver
-                        </a>
-                        <a
-                          href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`}
-                          target="_blank"
-                          className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs"
-                        >
-                          Google
-                        </a>
+                        <a href={`kakaomap://look?p=${h.lat},${h.lon}`} target="_blank" className="px-2 py-1 bg-yellow-400 rounded-full text-xs">Kakao</a>
+                        <a href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`} target="_blank" className="px-2 py-1 bg-green-600 text-white rounded-full text-xs">Naver</a>
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`} target="_blank" className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs">Google</a>
                       </div>
                     </div>
                   </div>
