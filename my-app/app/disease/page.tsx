@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useRouter } from 'next/navigation';
 
+//챗봇
+import { Bot } from 'lucide-react' // lucide 아이콘 사용
+import ChatModal from '@/components/ChatModal' // 챗봇 모달 컴포넌트
+import ChatWidget from '@/components/ChatWidget'
+
+//사이드바
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
@@ -15,8 +21,10 @@ export default function DiseaseSearchPage() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<any[]>([]);
     const router = useRouter();
-
+    //사이드바
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    //챗봇
+    const [isOpen, setIsOpen] = useState(false)
 
     const handleSearch = async () => {
         if (!query.trim()) return;
@@ -97,12 +105,21 @@ export default function DiseaseSearchPage() {
                     <Link href="/medicine" className="block hover:underline font-medium">
                         💊 의약품
                     </Link>
+                    <Link href="/chatbot" className="block hover:underline font-medium">
+                        📱 AI챗봇
+                    </Link>
                 </nav>
             </div>
             <div className="text-center">
                 <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 tracking-tight">🏥 질병 정보 서비스</h1>
                 <p className="mt-4 text-lg text-gray-600">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>
             </div>
+
+            {/* 우측 하단 챗봇 */}
+            <ChatWidget apiEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/llm/disease`} />
+
+            {/* 챗봇 질문 모달 */}
+            {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
 
             <Card className="p-6 backdrop-blur-lg bg-white/70 border border-sky-100 rounded-2xl shadow-md w-full max-w-md mx-auto mb-8">
                 <CardContent className="space-y-4">
