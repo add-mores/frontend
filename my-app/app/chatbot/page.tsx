@@ -27,7 +27,7 @@ export default function ChatPage() {
         setIsTyping(true)
 
         try {
-            const response = await fetch('/api/chat', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/llm/amedi`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ message: input }),
