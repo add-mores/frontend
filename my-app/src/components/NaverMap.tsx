@@ -1,6 +1,7 @@
 // components/NaverMap.tsx
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
 import type { Hospital } from '@/types'
+import { createTooltipOverlay, createTooltipElement } from './MapTooltipOverlay'
 
 export interface NaverMapHandle {
   panTo: (pos: { lat: number, lng: number }, opts?: any, hosNm?: string) => void
@@ -23,7 +24,14 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
   const mapInst = useRef<any>(null)
   const markers = useRef<Record<string, any>>({})
   const userMarker = useRef<any>(null)
-  const infoWindowRef = useRef<any>(null)
+  const overlayRef = useRef<any>(null)
+
+  const emergencyIcon = {
+    url: '/emergency.png',
+    size: new window.naver.maps.Size(32, 32),
+    anchor: new window.naver.maps.Point(16, 32),
+    scaledSize: new window.naver.maps.Size(32, 32),
+  }
 
   useEffect(() => {
     if (!mapRef.current || !window.naver?.maps) return
@@ -32,7 +40,6 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
         center: new window.naver.maps.LatLng(center.lat, center.lon),
         zoom: 15,
       })
-      infoWindowRef.current = new window.naver.maps.InfoWindow({ anchorSkew: true })
     }
   }, [])
 
@@ -46,29 +53,26 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
     if (!mapInst.current) return
     Object.values(markers.current).forEach(m => m.setMap(null))
     markers.current = {}
+
     hospitals.forEach(h => {
       const m = new window.naver.maps.Marker({
         position: new window.naver.maps.LatLng(h.lat, h.lon),
         map: mapInst.current,
         title: h.hos_nm,
+        icon: h.emer?.trim() === '있음' ? emergencyIcon : undefined,
       })
+
       m.addListener('click', () => {
-        const content = `
-          <div style="
-            padding: 8px;
-            min-width: 140px;
-            background-color: #fff;
-            color: #000;
-            font-size: 14px;
-          ">
-            <strong>${h.hos_nm}</strong><br/>
-            <small>${h.add}</small>
-          </div>
-        `
-        infoWindowRef.current.setContent(content)
-        infoWindowRef.current.open(mapInst.current, m)
+        overlayRef.current?.setMap(null)
+
+        const el = createTooltipElement(h.hos_nm, h.add, h.emer, h.emer_phone, h.deps)
+        const overlay = createTooltipOverlay(new window.naver.maps.LatLng(h.lat, h.lon), el)
+        overlay.setMap(mapInst.current)
+        overlayRef.current = overlay
+
         onMarkerClick?.(h)
       })
+
       markers.current[h.hos_nm] = m
     })
   }, [hospitals, onMarkerClick])
@@ -95,20 +99,11 @@ const NaverMap = forwardRef<NaverMapHandle, Props>((props, ref) => {
       if (hosNm && markers.current[hosNm]) {
         const h = hospitals.find(h => h.hos_nm === hosNm)
         if (h) {
-          const content = `
-            <div style="
-              padding: 8px;
-              min-width: 140px;
-              background-color: #fff;
-              color: #000;
-              font-size: 14px;
-            ">
-              <strong>${h.hos_nm}</strong><br/>
-              <small>${h.add}</small>
-            </div>
-          `
-          infoWindowRef.current.setContent(content)
-          infoWindowRef.current.open(mapInst.current, markers.current[hosNm])
+          overlayRef.current?.setMap(null)
+          const el = createTooltipElement(h.hos_nm, h.add, h.emer, h.emer_phone, h.deps)
+          const overlay = createTooltipOverlay(latLng, el)
+          overlay.setMap(mapInst.current)
+          overlayRef.current = overlay
         }
       }
     }

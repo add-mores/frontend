@@ -47,7 +47,7 @@ function SearchParamsHandler({ onDepartments }: { onDepartments: (queryDepts: st
 export default function ClientHospital() {
   // 상태 선언
   const [isAutoMode, setIsAutoMode] = useState(false)
-  const [selectedDepts, setSelectedDepts] = useState<string[]>([])
+  const [selectedDepts, setSelectedDepts] = useState<string[]>(['내과', '이비인후과'])
   const [location, setLocation] = useState<{ lat: number; lon: number; accuracy: number } | null>(null)
 
   const [searchAddress, setSearchAddress] = useState('')
@@ -58,6 +58,7 @@ export default function ClientHospital() {
   const [allDepts, setAllDepts] = useState<string[]>([])
   const [hospitals, setHospitals] = useState<Hospital[]>([])
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null)
+  const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -103,6 +104,14 @@ export default function ClientHospital() {
     }, 300);
     return () => clearTimeout(timer);
   }, [location, selectedDepts.join(','), debouncedName, radius]);
+
+
+  useEffect(() => {
+    if (selectedHospital) {
+      const el = cardRefs.current[selectedHospital.hos_nm]
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [selectedHospital])
 
   // URL 쿼리로 진료과가 있으면 selectedDepts에 세팅
   // 위치가 준비되면 쿼리 있는 경우, deps 포함 검색 수행
@@ -316,8 +325,11 @@ export default function ClientHospital() {
                   </button>
                 </div>
                 <div className="mt-3">
-                  <label className="text-sm text-gray-700">
-                    반경: <span className="font-medium">{radius.toFixed(1)}km</span>
+                  <label className="text-sm text-gray-700 flex items-center gap-1">
+                    반경:
+                    <output className="font-semibold text-blue-600">
+                      {radius.toFixed(1)}km
+                    </output>
                   </label>
                   <input
                     type="range"
@@ -382,14 +394,17 @@ export default function ClientHospital() {
                 {hospitals.map(h => (
                   <div
                     key={h.hos_nm}
+                    ref={el => (cardRefs.current[h.hos_nm] = el)}
                     onClick={() => onSelect(h)}
                     className={`
-    relative mb-4 p-4 rounded-2xl cursor-pointer transition-all duration-200
-    bg-white shadow-lg hover:shadow-xl
-    border ${selectedHospital?.hos_nm === h.hos_nm ? 'border-blue-500' : 'border-gray-200'}
-  `}
+  relative mb-4 p-4 rounded-2xl cursor-pointer transition-all duration-200
+  ${selectedHospital?.hos_nm === h.hos_nm
+                        ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-200'
+                        : 'bg-white border-gray-200 hover:shadow-xl'
+                      }
+  shadow-lg border
+`}
                   >
-
                     <div className="flex justify-between items-center">
                       <h3 className="font-semibold text-black text-base">{h.hos_nm}</h3>
                       <button onClick={() => onCopy(h.hos_nm)}>
@@ -397,8 +412,15 @@ export default function ClientHospital() {
                       </button>
                     </div>
 
-                    <p className="mt-1 text-sm text-gray-600">{h.add}</p>
-                    <p className="mt-1 text-sm text-gray-600">{h.deps}</p>
+                    <p className="mt-1 text-sm text-gray-600">
+                      <span className="font-semibold mr-1 text-gray-700">주소:</span>
+                      {h.add}
+                    </p>
+                    {h.deps && (
+                      <p className="mt-1 text-sm text-gray-600">
+                        <strong className="mr-1">진료과:</strong>{h.deps}
+                      </p>
+                    )}
 
                     {h.emer?.trim() === "있음" && (
                       <p className="mt-2 text-sm text-red-600 font-medium">
