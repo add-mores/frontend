@@ -330,6 +330,25 @@ export default function ClientHospital() {
                   </button>
                 </div>
               </div>
+              {/* ▣ 반경 슬라이더 ▣ */}
+              <div className="mb-4 bg-white rounded-2xl p-4 shadow-inner">
+                <label className="block text-sm text-gray-700 mb-2">
+                  반경: {radius} km
+                </label>
+                <input
+                  type="range"
+                  min={0.5}
+                  max={5}
+                  step={0.5}
+                  value={radius}
+                  onChange={e => {
+                    setRadius(parseFloat(e.target.value)); // 상태만 변경
+                    setAutoMove(false);                   // 자동 반경 계산 OFF
+                  }}
+                  className="w-full accent-blue-600"
+                />
+              </div>
+
 
               <div className="bg-white rounded-2xl p-4 shadow-inner">
                 <div className="flex space-x-2">
@@ -347,7 +366,7 @@ export default function ClientHospital() {
                     검색
                   </button>
                 </div>
-                <div className="mt-3 flex items-center space-x-2">
+                {/* <div className="mt-3 flex items-center space-x-2">
                   <input
                     type="checkbox"
                     checked={onlyEr}
@@ -357,7 +376,7 @@ export default function ClientHospital() {
                   <label className="text-sm text-gray-700 select-none">
                     응급실만 보기
                   </label>
-                </div>
+                </div> */}
               </div>
 
               {/* 진료과 필터 */}
