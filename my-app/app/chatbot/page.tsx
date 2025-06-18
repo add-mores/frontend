@@ -27,14 +27,14 @@ export default function ChatPage() {
         setIsTyping(true)
 
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/llm/amedi`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_CHATBOT_API}/llm/amedi`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: input }),
+                body: JSON.stringify({ question: input }),
             })
 
             const data = await response.json()
-            const botMessage = { role: 'bot', content: data.message }
+            const botMessage = { role: 'bot', content: data.answer }
 
             setMessages(prev => [...prev, botMessage])
         } catch (err) {

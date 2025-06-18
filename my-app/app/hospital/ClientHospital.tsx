@@ -217,12 +217,6 @@ export default function ClientHospital() {
           </nav>
         </div>
 
-        {/* 우측 하단 챗봇 */}
-        <ChatWidget apiEndpoint="/llm/hospital" />
-
-        {/* 챗봇 질문 모달 */}
-        {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
-
         <div className="max-w-6xl mx-auto space-y-16">
 
           {/* ─── 헤더 ─── */}

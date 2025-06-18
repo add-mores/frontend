@@ -139,12 +139,6 @@ export default function MedicineSearchPage() {
                     </nav>
                 </div>
 
-                {/* 우측 하단 챗봇 */}
-                <ChatWidget apiEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/llm/medicine`} />
-
-                {/* 챗봇 질문 모달 */}
-                {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
-
                 <div className="max-w-6xl mx-auto space-y-16">
                     <div className="text-center">
                         <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 tracking-tight">💊 의약품 추천 서비스</h1>
