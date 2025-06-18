@@ -115,6 +115,12 @@ export default function DiseaseSearchPage() {
                 <p className="mt-4 text-lg text-gray-600">증상이나 질병명을 입력하여 관련 질병 정보를 찾아보세요.</p>
             </div>
 
+            {/* 우측 하단 챗봇 */}
+            <ChatWidget apiEndpoint={`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/llm/disease`} />
+
+            {/* 챗봇 질문 모달 */}
+            {isOpen && <ChatModal onClose={() => setIsOpen(false)} />}
+
             <Card className="p-6 backdrop-blur-lg bg-white/70 border border-sky-100 rounded-2xl shadow-md w-full max-w-md mx-auto mb-8">
                 <CardContent className="space-y-4">
                     {/* Label */}
