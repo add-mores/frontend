@@ -54,6 +54,8 @@ export default function ClientHospital() {
   const [searchName, setSearchName] = useState('')
   const [debouncedName, setDebouncedName] = useState(searchName)
   const [radius, setRadius] = useState(1)
+  const [onlyEr, setOnlyEr] = useState(false)
+  const [autoMove, setAutoMove] = useState(true)
 
   const [allDepts, setAllDepts] = useState<string[]>([])
   const [hospitals, setHospitals] = useState<Hospital[]>([])
@@ -65,6 +67,20 @@ export default function ClientHospital() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+
+  const handleViewportChange = (
+    c: { lat: number; lon: number },
+    r: number
+  ) => {
+    if (!autoMove) return
+    setLocation({ lat: c.lat, lon: c.lon, accuracy: 0 })
+    // 0.1 km 단위로 반올림
+    setRadius(prev => {
+      const newR = parseFloat(r.toFixed(1))
+      return Math.abs(prev - newR) > 0.05 ? newR : prev
+    })
+  }
 
   //챗봇
   const [isOpen, setIsOpen] = useState(false)
@@ -113,6 +129,10 @@ export default function ClientHospital() {
     }
   }, [selectedHospital])
 
+  useEffect(() => {
+    if (location) fetchHospitals(selectedDepts)   // 현재 조건으로 즉시 재요청
+  }, [onlyEr])
+
   // URL 쿼리로 진료과가 있으면 selectedDepts에 세팅
   // 위치가 준비되면 쿼리 있는 경우, deps 포함 검색 수행
   useEffect(() => {
@@ -139,6 +159,7 @@ export default function ClientHospital() {
         radius,
         search_name: debouncedName || undefined,
         deps: deps && deps.length > 0 ? deps : undefined,
+        only_er: onlyEr ? true : undefined,
       }
 
       const res = await axios.post(`${apiBase}/api/hospital`, params)
@@ -157,7 +178,7 @@ export default function ClientHospital() {
     if (location) {
       fetchHospitals(selectedDepts.length > 0 ? selectedDepts : [])
     }
-  }, [location, selectedDepts, radius, debouncedName])
+  }, [location, selectedDepts, radius, debouncedName, onlyEr])
 
   // 주소 검색 버튼 핸들러
   const handleSearchAddress = async () => {
@@ -279,6 +300,8 @@ export default function ClientHospital() {
                     hospitals={hospitals}
                     selectedHos={selectedHospital?.hos_nm}
                     onMarkerClick={onSelect}
+                    onMapClick={() => setSelectedHospital(null)}
+                    onViewportChange={handleViewportChange}
                     className="w-full h-full"
                   />
                 )}
@@ -324,20 +347,16 @@ export default function ClientHospital() {
                     검색
                   </button>
                 </div>
-                <div className="mt-3">
-                  <label className="text-sm text-gray-700 flex items-center gap-1">
-                    반경:
-                    <output className="font-semibold text-blue-600">
-                      {radius.toFixed(1)}km
-                    </output>
-                  </label>
+                <div className="mt-3 flex items-center space-x-2">
                   <input
-                    type="range"
-                    min={0.1} max={5} step={0.1}
-                    value={radius}
-                    onChange={e => setRadius(+e.target.value)}
-                    className="w-full mt-1 accent-blue-400"
+                    type="checkbox"
+                    checked={onlyEr}
+                    onChange={() => setOnlyEr(!onlyEr)}
+                    className="w-4 h-4 accent-red-500"
                   />
+                  <label className="text-sm text-gray-700 select-none">
+                    응급실만 보기
+                  </label>
                 </div>
               </div>
 
@@ -391,66 +410,98 @@ export default function ClientHospital() {
                 {!loading && hospitals.length === 0 && !error && (
                   <p className="text-gray-500">조건에 맞는 병원이 없습니다.</p>
                 )}
-                {hospitals.map(h => (
-                  <div
-                    key={h.hos_nm}
-                    ref={el => (cardRefs.current[h.hos_nm] = el)}
-                    onClick={() => onSelect(h)}
-                    className={`
-  relative mb-4 p-4 rounded-2xl cursor-pointer transition-all duration-200
-  ${selectedHospital?.hos_nm === h.hos_nm
-                        ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-200'
-                        : 'bg-white border-gray-200 hover:shadow-xl'
-                      }
-  shadow-lg border
-`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-semibold text-black text-base">{h.hos_nm}</h3>
-                      <button onClick={() => onCopy(h.hos_nm)}>
-                        <CopyIcon className="w-5 h-5 text-gray-400 hover:text-gray-600" />
-                      </button>
-                    </div>
+                {hospitals.map(h => {
+                  // 병원명-위도-경도를 조합해 고유 key 생성
+                  const uniqKey = `${h.hos_nm}-${h.lat}-${h.lon}`;
 
-                    <p className="mt-1 text-sm text-gray-600">
-                      <span className="font-semibold mr-1 text-gray-700">주소:</span>
-                      {h.add}
-                    </p>
-                    {h.deps && (
+                  return (
+                    <div
+                      key={uniqKey}
+                      ref={el => (cardRefs.current[uniqKey] = el)}
+                      onClick={() => onSelect(h)}
+                      className={`
+        relative mb-4 p-4 rounded-2xl cursor-pointer transition-all duration-200
+        ${selectedHospital?.hos_nm === h.hos_nm
+                          ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-200'
+                          : 'bg-white border-gray-200 hover:shadow-xl'}
+        shadow-lg border
+      `}
+                    >
+                      {/* ── 병원명 + 복사 버튼 ── */}
+                      <div className="flex justify-between items-center">
+                        <h3 className="font-semibold text-black text-base">{h.hos_nm}</h3>
+                        <button onClick={() => onCopy(h.hos_nm)}>
+                          <CopyIcon className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                        </button>
+                      </div>
+
+                      {/* ── 주소 ── */}
                       <p className="mt-1 text-sm text-gray-600">
-                        <strong className="mr-1">진료과:</strong>{h.deps}
+                        <span className="font-semibold mr-1 text-gray-700">주소:</span>
+                        {h.add}
                       </p>
-                    )}
 
-                    {h.emer?.trim() === "있음" && (
-                      <p className="mt-2 text-sm text-red-600 font-medium">
-                        🆘 응급실 운영중
-                        {h.emer_phone && (
-                          <>
-                            {" · "}
-                            <span className="text-blue-600 font-semibold">☎ {h.emer_phone}</span>
-                          </>
-                        )}
-                      </p>
-                    )}
+                      {/* ── 진료과 목록 ── */}
+                      {h.deps && (
+                        <p className="mt-1 text-sm text-gray-600">
+                          <strong className="mr-1">진료과:</strong>
+                          {h.deps}
+                        </p>
+                      )}
 
-                    <div className="mt-3 flex justify-between items-center">
-                      <span className="text-blue-600 font-medium">{h.distance.toFixed(2)}km</span>
-                      <div className="flex space-x-2">
-                        <a href={`kakaomap://look?p=${h.lat},${h.lon}`} target="_blank" className="px-2 py-1 bg-yellow-400 rounded-full text-xs">Kakao</a>
-                        <a href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`} target="_blank" className="px-2 py-1 bg-green-600 text-white rounded-full text-xs">Naver</a>
-                        <a href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`} target="_blank" className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs">Google</a>
+                      {/* ── 응급실 표시 ── */}
+                      {h.emer?.trim() === '있음' && (
+                        <p className="mt-2 text-sm text-red-600 font-medium">
+                          🆘 응급실 운영중
+                          {h.emer_phone && (
+                            <>
+                              {' · '}
+                              <span className="text-blue-600 font-semibold">☎ {h.emer_phone}</span>
+                            </>
+                          )}
+                        </p>
+                      )}
+
+                      {/* ── 거리 + 외부 지도 링크 ── */}
+                      <div className="mt-3 flex justify-between items-center">
+                        <span className="text-blue-600 font-medium">
+                          {h.distance.toFixed(2)}km
+                        </span>
+                        <div className="flex space-x-2">
+                          <a
+                            href={`kakaomap://look?p=${h.lat},${h.lon}`}
+                            target="_blank"
+                            className="px-2 py-1 bg-yellow-400 rounded-full text-xs"
+                          >
+                            Kakao
+                          </a>
+                          <a
+                            href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`}
+                            target="_blank"
+                            className="px-2 py-1 bg-green-600 text-white rounded-full text-xs"
+                          >
+                            Naver
+                          </a>
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`}
+                            target="_blank"
+                            className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs"
+                          >
+                            Google
+                          </a>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+
               </div>
 
             </div>
           </div>
 
         </div>
-      </div>
+      </div >
     </>
   )
 }
