@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import Link from "next/link";
 import { Menu, ArrowRight } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export default function ChatPage() {
     const [messages, setMessages] = useState<{ role: string; content: string }[]>([
@@ -38,7 +40,7 @@ export default function ChatPage() {
 
             setMessages(prev => [...prev, botMessage])
         } catch (err) {
-            setMessages(prev => [...prev, { role: 'bot', content: '에러가 발생했습니다. 다시 시도해 주세요.' }])
+            setMessages(prev => [...prev, { role: 'bot', content: '에러가 발생했습니다. 다시 시도해 주세요' }])
         } finally {
             setIsTyping(false)
         }
@@ -86,20 +88,21 @@ export default function ChatPage() {
                 <div className="flex-1 overflow-y-auto space-y-4 pr-2">
                     {messages.map((msg, idx) => (
                         <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-xs px-4 py-2 rounded-2xl relative text-sm shadow-md ${msg.role === 'user' ? 'bg-blue-500 text-white rounded-br-none mr-7'
+                            <div className={`max-w-[55%] px-4 py-2 rounded-2xl relative text-lg shadow-md ${msg.role === 'user' ? 'bg-blue-500 text-white rounded-br-none mr-7'
                                 : 'bg-white text-gray-900 rounded-bl-none ml-10'}`}>
                                 <div className={`absolute top-2 w-0 h-0 border-y-6 border-y-transparent ${msg.role === 'user'
                                     ? 'right-[-12px] border-l-8 border-l-blue-500'
                                     : 'left-[-12px] border-r-8 border-r-white'}`} />
 
-                                {msg.content}
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                             </div>
                         </div>
                     ))}
 
                     {isTyping && (
                         <div className="flex justify-start">
-                            <div className="bg-white text-gray-800 text-sm px-4 py-2 rounded-2xl rounded-bl-none shadow-md animate-pulse">
+                            <div className="relative max-w-xs px-4 py-2 rounded-2xl bg-white text-gray-800 text-sm shadow-md rounded-bl-none ml-10 animate-pulse">
+                                <div className="absolute top-2 left-[-12px] w-0 h-0 border-y-6 border-y-transparent border-r-8 border-r-white" />
                                 ...
                             </div>
                         </div>
