@@ -246,6 +246,10 @@ export default function ClientHospital() {
             </Link>
           </nav>
         </div>
+<<<<<<< 0.9/api
+
+=======
+>>>>>>> 0.9/dev
         <div className="max-w-6xl mx-auto space-y-16">
 
           {/* ─── 헤더 ─── */}
