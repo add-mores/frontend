@@ -250,127 +250,127 @@ export default function ClientHospital() {
 
 =======
 >>>>>>> 0.9/dev
-        <div className="max-w-6xl mx-auto space-y-16">
+  <div className="max-w-6xl mx-auto space-y-16">
 
-          {/* ─── 헤더 ─── */}
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700">
-              🏥 병원 정보 서비스
-            </h1>
-            <p className="mt-4 text-lg text-gray-600">
-              입력한 증상과 조건을 기반으로 최적의 병원을 추천해드립니다.
-            </p>
-          </div>
+    {/* ─── 헤더 ─── */}
+    <div className="text-center">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700">
+        🏥 병원 정보 서비스
+      </h1>
+      <p className="mt-4 text-lg text-gray-600">
+        입력한 증상과 조건을 기반으로 최적의 병원을 추천해드립니다.
+      </p>
+    </div>
 
-          {/* ─── 메인 레이아웃: 지도(60%) + 사이드바(40%) ─── */}
-          <div className="flex gap-6">
+    {/* ─── 메인 레이아웃: 지도(60%) + 사이드바(40%) ─── */}
+    <div className="flex gap-6">
 
-            {/* ─── 지도 영역 ─── */}
-            <div className="w-3/5 h-[70vh] rounded-3xl overflow-hidden shadow-lg relative">
-              {/* 정확도 배지 (지도 위) */}
-              {location && (
-                <>
-                  {/* 내 위치 재요청 버튼 */}
-                  {/* 정확도 배지 */}
-                  {location && (
-                    <div className="absolute top-3 left-3 z-20 inline-flex items-center space-x-1
+      {/* ─── 지도 영역 ─── */}
+      <div className="w-3/5 h-[70vh] rounded-3xl overflow-hidden shadow-lg relative">
+        {/* 정확도 배지 (지도 위) */}
+        {location && (
+          <>
+            {/* 내 위치 재요청 버튼 */}
+            {/* 정확도 배지 */}
+            {location && (
+              <div className="absolute top-3 left-3 z-20 inline-flex items-center space-x-1
                            bg-white px-3 py-1 rounded-full text-sm font-medium text-black
                            ring-1 ring-gray-300 shadow">
-                      {location.accuracy > 0
-                        ? <>📍 정확도: ±{Math.round(location.accuracy)}m</>
-                        : <>📍 주소 기준</>
-                      }
-                    </div>
-                  )}
+                {location.accuracy > 0
+                  ? <>📍 정확도: ±{Math.round(location.accuracy)}m</>
+                  : <>📍 주소 기준</>
+                }
+              </div>
+            )}
 
-                  {/* 내 위치 재요청 버튼 */}
-                  <button
-                    onClick={getLocation}
-                    className="absolute top-3 right-3 z-20 bg-white px-3 py-1 rounded-lg
+            {/* 내 위치 재요청 버튼 */}
+            <button
+              onClick={getLocation}
+              className="absolute top-3 right-3 z-20 bg-white px-3 py-1 rounded-lg
                              text-sm font-medium text-gray-700 ring-1 ring-gray-300 shadow
                              hover:ring-blue-400 transition"
-                  >
-                    내 위치 재요청
-                  </button>
-                </>
-              )}
+            >
+              내 위치 재요청
+            </button>
+          </>
+        )}
 
-              <div className="w-full h-full">
-                {location && (
-                  <NaverMap
-                    ref={mapRef}
-                    center={location}
-                    userLocation={location}
-                    hospitals={hospitals}
-                    selectedHos={selectedHospital?.hos_nm}
-                    onMarkerClick={onSelect}
-                    onMapClick={() => setSelectedHospital(null)}
-                    onViewportChange={handleViewportChange}
-                    className="w-full h-full"
-                  />
-                )}
-              </div>
-            </div>
+        <div className="w-full h-full">
+          {location && (
+            <NaverMap
+              ref={mapRef}
+              center={location}
+              userLocation={location}
+              hospitals={hospitals}
+              selectedHos={selectedHospital?.hos_nm}
+              onMarkerClick={onSelect}
+              onMapClick={() => setSelectedHospital(null)}
+              onViewportChange={handleViewportChange}
+              className="w-full h-full"
+            />
+          )}
+        </div>
+      </div>
 
-            {/* ─── 사이드바 영역 ─── */}
-            <div className="w-2/5 flex flex-col h-[70vh] space-y-4">
+      {/* ─── 사이드바 영역 ─── */}
+      <div className="w-2/5 flex flex-col h-[70vh] space-y-4">
 
-              {/* 검색 & 반경 */}
-              {/* ─── 주소 검색 ─── */}
-              <div className="mb-4 bg-white rounded-2xl p-4 shadow-inner">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    placeholder="📍 주소를 입력하세요"
-                    value={searchAddress}
-                    onChange={e => setSearchAddress(e.target.value)}
-                    className="flex-1 px-4 py-2 bg-black-100 rounded-lg text-black"
-                  />
-                  <button
-                    onClick={handleSearchAddress}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                  >
-                    위치 검색
-                  </button>
-                </div>
-              </div>
-              {/* ▣ 반경 슬라이더 ▣ */}
-              <div className="mb-4 bg-white rounded-2xl p-4 shadow-inner">
-                <label className="block text-sm text-gray-700 mb-2">
-                  반경: {radius} km
-                </label>
-                <input
-                  type="range"
-                  min={0.5}
-                  max={5}
-                  step={0.5}
-                  value={radius}
-                  onChange={e => {
-                    setRadius(parseFloat(e.target.value)); // 상태만 변경
-                    setAutoMove(false);                   // 자동 반경 계산 OFF
-                  }}
-                  className="w-full accent-blue-600"
-                />
-              </div>
+        {/* 검색 & 반경 */}
+        {/* ─── 주소 검색 ─── */}
+        <div className="mb-4 bg-white rounded-2xl p-4 shadow-inner">
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              placeholder="📍 주소를 입력하세요"
+              value={searchAddress}
+              onChange={e => setSearchAddress(e.target.value)}
+              className="flex-1 px-4 py-2 bg-black-100 rounded-lg text-black"
+            />
+            <button
+              onClick={handleSearchAddress}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              위치 검색
+            </button>
+          </div>
+        </div>
+        {/* ▣ 반경 슬라이더 ▣ */}
+        <div className="mb-4 bg-white rounded-2xl p-4 shadow-inner">
+          <label className="block text-sm text-gray-700 mb-2">
+            반경: {radius} km
+          </label>
+          <input
+            type="range"
+            min={0.5}
+            max={5}
+            step={0.5}
+            value={radius}
+            onChange={e => {
+              setRadius(parseFloat(e.target.value)); // 상태만 변경
+              setAutoMove(false);                   // 자동 반경 계산 OFF
+            }}
+            className="w-full accent-blue-600"
+          />
+        </div>
 
 
-              <div className="bg-white rounded-2xl p-4 shadow-inner">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
-                    placeholder="🔍 병원명 검색"
-                    value={searchName}
-                    onChange={e => setSearchName(e.target.value)}
-                    className="flex-1 px-4 py-2 bg-gray-100 rounded-lg text-black"
-                  />
-                  <button
-                    onClick={() => setDebouncedName(searchName)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-                  >
-                    검색
-                  </button>
-                </div>
-                {/* <div className="mt-3 flex items-center space-x-2">
+        <div className="bg-white rounded-2xl p-4 shadow-inner">
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              placeholder="🔍 병원명 검색"
+              value={searchName}
+              onChange={e => setSearchName(e.target.value)}
+              className="flex-1 px-4 py-2 bg-gray-100 rounded-lg text-black"
+            />
+            <button
+              onClick={() => setDebouncedName(searchName)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            >
+              검색
+            </button>
+          </div>
+          {/* <div className="mt-3 flex items-center space-x-2">
                   <input
                     type="checkbox"
                     checked={onlyEr}
@@ -381,149 +381,149 @@ export default function ClientHospital() {
                     응급실만 보기
                   </label>
                 </div> */}
-              </div>
+        </div>
 
-              {/* 진료과 필터 */}
-              <details className="bg-white rounded-2xl p-4 shadow-inner">
-                <summary className="flex justify-between items-center cursor-pointer text-black">
-                  <span>진료과 필터</span>
-                  <span className="text-sm">{selectedDepts.length}개 선택</span>
-                </summary>
-                <div className="mt-2 max-h-44 overflow-auto space-y-2">
-                  {allDepts.map(d => (
-                    <label key={d} className="flex items-center space-x-2 text-gray-600">
-                      <input
-                        type="checkbox"
-                        disabled={isAutoMode}
-                        checked={selectedDepts.includes(d)}
-                        onChange={() => {
-                          setSelectedDepts(prev =>
-                            prev.includes(d)
-                              ? prev.filter(x => x !== d)
-                              : [...prev, d]
-                          )
-                        }}
-                        className="w-4 h-4 text-blue-400"
-                      />
-                      <span>{d}</span>
-                    </label>
-                  ))}
-                  {isAutoMode && (
-                    <button
-                      onClick={() => setIsAutoMode(false)}
-                      className="w-full py-1 bg-gray-300 rounded-lg"
-                    >
-                      수동 모드 전환
-                    </button>
-                  )}
-                </div>
-              </details>
-
-              {/* 병원 목록 (스크롤 영역) */}
-              <div
-                className="bg-white rounded-2xl p-4 shadow-inner overflow-y-auto"
-                style={{ maxHeight: 'calc(70vh - 16rem)' }}
+        {/* 진료과 필터 */}
+        <details className="bg-white rounded-2xl p-4 shadow-inner">
+          <summary className="flex justify-between items-center cursor-pointer text-black">
+            <span>진료과 필터</span>
+            <span className="text-sm">{selectedDepts.length}개 선택</span>
+          </summary>
+          <div className="mt-2 max-h-44 overflow-auto space-y-2">
+            {allDepts.map(d => (
+              <label key={d} className="flex items-center space-x-2 text-gray-600">
+                <input
+                  type="checkbox"
+                  disabled={isAutoMode}
+                  checked={selectedDepts.includes(d)}
+                  onChange={() => {
+                    setSelectedDepts(prev =>
+                      prev.includes(d)
+                        ? prev.filter(x => x !== d)
+                        : [...prev, d]
+                    )
+                  }}
+                  className="w-4 h-4 text-blue-400"
+                />
+                <span>{d}</span>
+              </label>
+            ))}
+            {isAutoMode && (
+              <button
+                onClick={() => setIsAutoMode(false)}
+                className="w-full py-1 bg-gray-300 rounded-lg"
               >
-                <div className="flex items-center mb-4">
-                  <Clipboard className="w-6 h-6 text-yellow-400 mr-2" />
-                  <h2 className="text-2xl font-bold text-black">병원 목록</h2>
-                </div>
-                {loading && <p className="text-center text-gray-400">로딩 중...</p>}
-                {error && <p className="text-center text-red-500">에러: {error}</p>}
-                {!loading && hospitals.length === 0 && !error && (
-                  <p className="text-gray-500">조건에 맞는 병원이 없습니다.</p>
-                )}
-                {hospitals.map(h => {
-                  // 병원명-위도-경도를 조합해 고유 key 생성
-                  const uniqKey = `${h.hos_nm}-${h.lat}-${h.lon}`;
+                수동 모드 전환
+              </button>
+            )}
+          </div>
+        </details>
 
-                  return (
-                    <div
-                      key={uniqKey}
-                      ref={el => (cardRefs.current[uniqKey] = el)}
-                      onClick={() => onSelect(h)}
-                      className={`
+        {/* 병원 목록 (스크롤 영역) */}
+        <div
+          className="bg-white rounded-2xl p-4 shadow-inner overflow-y-auto"
+          style={{ maxHeight: 'calc(70vh - 16rem)' }}
+        >
+          <div className="flex items-center mb-4">
+            <Clipboard className="w-6 h-6 text-yellow-400 mr-2" />
+            <h2 className="text-2xl font-bold text-black">병원 목록</h2>
+          </div>
+          {loading && <p className="text-center text-gray-400">로딩 중...</p>}
+          {error && <p className="text-center text-red-500">에러: {error}</p>}
+          {!loading && hospitals.length === 0 && !error && (
+            <p className="text-gray-500">조건에 맞는 병원이 없습니다.</p>
+          )}
+          {hospitals.map(h => {
+            // 병원명-위도-경도를 조합해 고유 key 생성
+            const uniqKey = `${h.hos_nm}-${h.lat}-${h.lon}`;
+
+            return (
+              <div
+                key={uniqKey}
+                ref={el => (cardRefs.current[uniqKey] = el)}
+                onClick={() => onSelect(h)}
+                className={`
         relative mb-4 p-4 rounded-2xl cursor-pointer transition-all duration-200
         ${selectedHospital?.hos_nm === h.hos_nm
-                          ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-200'
-                          : 'bg-white border-gray-200 hover:shadow-xl'}
+                    ? 'bg-blue-50 border-blue-500 ring-2 ring-blue-200'
+                    : 'bg-white border-gray-200 hover:shadow-xl'}
         shadow-lg border
       `}
+              >
+                {/* ── 병원명 + 복사 버튼 ── */}
+                <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-black text-base">{h.hos_nm}</h3>
+                  <button onClick={() => onCopy(h.hos_nm)}>
+                    <CopyIcon className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+                  </button>
+                </div>
+
+                {/* ── 주소 ── */}
+                <p className="mt-1 text-sm text-gray-600">
+                  <span className="font-semibold mr-1 text-gray-700">주소:</span>
+                  {h.add}
+                </p>
+
+                {/* ── 진료과 목록 ── */}
+                {h.deps && (
+                  <p className="mt-1 text-sm text-gray-600">
+                    <strong className="mr-1">진료과:</strong>
+                    {h.deps}
+                  </p>
+                )}
+
+                {/* ── 응급실 표시 ── */}
+                {h.emer?.trim() === '있음' && (
+                  <p className="mt-2 text-sm text-red-600 font-medium">
+                    🆘 응급실 운영중
+                    {h.emer_phone && (
+                      <>
+                        {' · '}
+                        <span className="text-blue-600 font-semibold">☎ {h.emer_phone}</span>
+                      </>
+                    )}
+                  </p>
+                )}
+
+                {/* ── 거리 + 외부 지도 링크 ── */}
+                <div className="mt-3 flex justify-between items-center">
+                  <span className="text-blue-600 font-medium">
+                    {h.distance.toFixed(2)}km
+                  </span>
+                  <div className="flex space-x-2">
+                    <a
+                      href={`kakaomap://look?p=${h.lat},${h.lon}`}
+                      target="_blank"
+                      className="px-2 py-1 bg-yellow-400 rounded-full text-xs"
                     >
-                      {/* ── 병원명 + 복사 버튼 ── */}
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-black text-base">{h.hos_nm}</h3>
-                        <button onClick={() => onCopy(h.hos_nm)}>
-                          <CopyIcon className="w-5 h-5 text-gray-400 hover:text-gray-600" />
-                        </button>
-                      </div>
-
-                      {/* ── 주소 ── */}
-                      <p className="mt-1 text-sm text-gray-600">
-                        <span className="font-semibold mr-1 text-gray-700">주소:</span>
-                        {h.add}
-                      </p>
-
-                      {/* ── 진료과 목록 ── */}
-                      {h.deps && (
-                        <p className="mt-1 text-sm text-gray-600">
-                          <strong className="mr-1">진료과:</strong>
-                          {h.deps}
-                        </p>
-                      )}
-
-                      {/* ── 응급실 표시 ── */}
-                      {h.emer?.trim() === '있음' && (
-                        <p className="mt-2 text-sm text-red-600 font-medium">
-                          🆘 응급실 운영중
-                          {h.emer_phone && (
-                            <>
-                              {' · '}
-                              <span className="text-blue-600 font-semibold">☎ {h.emer_phone}</span>
-                            </>
-                          )}
-                        </p>
-                      )}
-
-                      {/* ── 거리 + 외부 지도 링크 ── */}
-                      <div className="mt-3 flex justify-between items-center">
-                        <span className="text-blue-600 font-medium">
-                          {h.distance.toFixed(2)}km
-                        </span>
-                        <div className="flex space-x-2">
-                          <a
-                            href={`kakaomap://look?p=${h.lat},${h.lon}`}
-                            target="_blank"
-                            className="px-2 py-1 bg-yellow-400 rounded-full text-xs"
-                          >
-                            Kakao
-                          </a>
-                          <a
-                            href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`}
-                            target="_blank"
-                            className="px-2 py-1 bg-green-600 text-white rounded-full text-xs"
-                          >
-                            Naver
-                          </a>
-                          <a
-                            href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`}
-                            target="_blank"
-                            className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs"
-                          >
-                            Google
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
+                      Kakao
+                    </a>
+                    <a
+                      href={`https://map.naver.com/v5/search/${encodeURIComponent(h.hos_nm)}`}
+                      target="_blank"
+                      className="px-2 py-1 bg-green-600 text-white rounded-full text-xs"
+                    >
+                      Naver
+                    </a>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${h.lat},${h.lon}`}
+                      target="_blank"
+                      className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs"
+                    >
+                      Google
+                    </a>
+                  </div>
+                </div>
               </div>
-
-            </div>
-          </div>
+            );
+          })}
 
         </div>
+
+      </div>
+    </div>
+
+  </div>
       </div >
     </>
   )
