@@ -3,10 +3,10 @@
 
 ---
 ## 메인 화면
-<img width="700" alt="image" src="https://github.com/user-attachments/assets/8c5cdb1b-4054-4657-b3bc-4288bf72af99" />
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/4a4c1e9b-599f-448e-aa98-2c23d591314e" />
 
 ### 사이드 바
-<img width="368" alt="image" src="https://github.com/user-attachments/assets/c9c46b81-5e85-4ffb-b7f8-6c62f90132fe" />
+<img width="368" alt="image" src="https://github.com/user-attachments/assets/5601b745-bd0e-422a-a3f3-e708b829b0d9" />
 
 
 ## 질병 정보 서비스
