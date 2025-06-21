@@ -39,5 +39,7 @@
 ## AI 챗봇 서비스
 ### 챗봇 화면
 - 자연어로 된 증상을 입력하면 그에 따른 증상을 확인 후 질병 정보를 추측하고 안내합니다.
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/d5b12c30-4442-45d0-8499-be1e6eba4d59" />
+
 - `증상에 맞는 의약품을 추천해줘` 라고 요청하면 그에 맞는 의약품을 추천해줍니다.
 <img width="700" alt="image" src="https://github.com/user-attachments/assets/0abbffa0-3a16-4fa1-a183-504e6fdfbdbd" />
