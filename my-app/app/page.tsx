@@ -8,7 +8,7 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-white via-sky-50 to-blue-100 py-16 px-6 md:px-12">
       <div className="text-center mb-10 animate-fadein">
         <h1 className="text-4xl md:text-5xl font-extrabold text-sky-700 tracking-tight mb-5">
-          🩺 증상 기반 질병 예측 및 의료 정보 추천 서비스
+           AmedI 나만의 의료 AI 서비스
         </h1>
         <p className="text-lg md:text-xl text-gray-700">
           <strong className="text-teal-700 font-semibold">입력한 증상으로 AI가 유사한 질병을 예측하고,</strong><br />
