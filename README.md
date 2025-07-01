@@ -3,7 +3,7 @@
 
 ---
 ## 메인 화면
-<img width="700" alt="image" src="https://github.com/user-attachments/assets/4a4c1e9b-599f-448e-aa98-2c23d591314e" />
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/6d6f7980-6f1e-4dfb-9a76-ceb04fa95fd5" />
 
 ### 사이드 바
 <img width="368" alt="image" src="https://github.com/user-attachments/assets/5601b745-bd0e-422a-a3f3-e708b829b0d9" />
