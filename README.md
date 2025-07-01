@@ -12,7 +12,6 @@
 ## 질병 정보 서비스
 - 증상을 입력하면 가장 관련도가 높은 5개의 질병 정보를 안내해줍니다.
 <img width="700" alt="image" src="https://github.com/user-attachments/assets/0e3ffe89-914e-4b98-bb7c-7bc6055114e6" />
-<img width="700" alt="image" src="https://github.com/user-attachments/assets/a534f70b-eaf7-4471-8a6e-734ee153b025" />
 
 ## 의약품 추천 서비스
 ### 질병 연동 화면
